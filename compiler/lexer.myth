@@ -1,0 +1,20 @@
+use package::token::{token, tokentype}
+
+fn main(content string)!:
+    let std_indent = tokenizer{content}.parse_indent()?
+    let tokens = tokenizer{content}.run(std_indent)?
+
+
+class tokenizer:
+    struct 
+    { 
+        content string,
+        std_indent u32 = 4,
+        token ?[token] = none,
+        line i64 = 0,
+        char i64 = 0,
+    }
+
+    
+    
+
