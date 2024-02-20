@@ -3,15 +3,15 @@ import lexer, token, parser, error
 
 
 enum bmc_err:
-    list(list_err),
-    file(file_err),
-    lexer(lexer_err),
-    tree(tree_err),
-    ast(ast_err),
-    other,
+    list(list_err)
+    file(file_err)
+    lexer(lexer_err)
+    tree(tree_err)
+    ast(ast_err)
+    other
     arg
 
-fn main()bmc_err!:
+fn main()bmc_err!: 
     let setting = sys::argv
     let param = setting[1].catch(|e|bmc_err.list(e))
     match param:
@@ -32,28 +32,28 @@ fn main()bmc_err!:
 
 
 enum isa:
-    riscv,
-    x86,
+    riscv
+    x86
     armv8
  
 enum platform:
-    mac,
-    linux,
-    windows,
+    mac
+    linux
+    windows
     bard
  
 enum optimize:
-    memory,
-    speed,
+    memory
+    speed
     normal
  
-struct configuration:
-    isa: isa,
-    os: platform,
-    optimization: optimize,
-    output_loc: ?path,
+struct config:
+    isa: isa
+    os: platform
+    optimization: optimize
+    output_loc: ?path
  
-fn configure(arg [string], conf ?configuration = None) !configuration:
+fn configure(arg: [string], conf: ?config = None) !config:
     for i in range(arg):
         match arg[i]:
             "-output" => 
