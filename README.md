@@ -9,8 +9,9 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 
 ```mythic
 let monday = ['😊', '🤨', '🤪', '😴']
-for emotion in monday:
+for emotion in monday{
     println(emotion)
+}
 ```
 <br/>
 
