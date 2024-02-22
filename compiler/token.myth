@@ -1,11 +1,11 @@
-struct token {
-    type: tokentype
+struct Token {
+    type: TokenType
     literal: ?string
     line: u32
     file: string
 }
 
-enum tokentype {
+enum TokenType {
 # operators
     l_paren, r_paren, l_brace, r_brace, l_curly
     r_curly, l_vec, r_vec, l_slash, r_slash

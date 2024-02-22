@@ -2,63 +2,63 @@ package os, sys
 import lexer, token, parser, error
 
 
-enum bmc_err {
-    list(list_err)
-    file(file_err)
-    lexer(lexer_err)
-    tree(tree_err)
-    ast(ast_err)
-    other
-    arg
+enum BmcErr {
+    List(ListErr)
+    File(FileErr)
+    Lexer(LexerErr)
+    Tree(TreeErr)
+    Ast(AstErr)
+    Other
+    Arg
 }
 
-fn main()bmc_err! { 
+fn main()BmcErr! { 
     let setting = sys::argv
-    let param = setting[1].catch(|e|bmc_err.list(e))
+    let param = setting[1].catch(|e|BmcErr.list(e))
     match param {
-        "-help" => {option(); return}
-        "-h" => {option(); return}
-        "-version" => {version(); return}
-        "-v" => {version(); return}
+        "-help" => return option()
+        "-h" => return option()
+        "-version" => return version()
+        "-v" => return version()
         _ =>
     }
-    let content = os::read_file(param, 'utf8').catch(|e|bmc_err.file(e))
-    let token = lexer::main(content).catch(|e|bmc_err.lexer(e))
-    let tree = parser::tree::main(token).catch(|e|bmc_err.tree(e))
-    let ast = parser::ast::parse(tree).catch(|e|bmc_err.ast(e))
+    let content = os::read_file(param, 'utf8').catch(|e|BmcErr.file(e))
+    let token = lexer::main(content).catch(|e|BmcErr.lexer(e))
+    let tree = parser::tree::main(token).catch(|e|BmcErr.tree(e))
+    let ast = parser::ast::parse(tree).catch(|e|BmcErr.ast(e))
     let ir = ir::translate(ast)
     var arg = (
         setting
-        .del(0).catch(|_|bmc_err.other)
-        .del(0).catch(|_|bmc_err.other)
+        .del(0).catch(|_|BmcErr.other)
+        .del(0).catch(|_|BmcErr.other)
     )
-    let conf = configure(arg).catch(|_|bcm_err.arg)
+    let conf = configure(arg).catch(|_|BmcErr.arg)
 }
 
-enum isa {
-    riscv
-    x86
-    armv8
+enum Isa {
+    Riscv
+    X86
+    Armv8
 }
 
-enum platform {
-    mac
-    linux
-    windows
-    bard
+enum Platform {
+    Mac
+    Linux
+    Windows
+    Bard
 }
 
-enum optimize {
-    memory
-    speed
-    normal
+enum Optimize {
+    Memory
+    Speed
+    Normal
 }
 
-struct config {
-    isa: isa
-    os: platform
-    optimization: optimize
-    output_loc: ?path
+struct Config {
+    isa: Isa
+    os: Platform
+    optimization: Optimize
+    output_loc: ?Path
 }
 
-fn configure(arg: [string], conf: ?config = None) !config {}
+fn configure(arg: [string], conf: ?Config = None) !Config {}

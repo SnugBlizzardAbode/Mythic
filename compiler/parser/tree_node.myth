@@ -1,22 +1,22 @@
-enum node{
-    package_def(package_node)
-    import_def(import_node)
-    mod_def(mode_node)
-    struct_def(struct_node)
-    enum_def(enum_node)
-    class_def(class_node)
-    extend_def(extend_node)
-    var_def(var_def_node)
-    fn_def(fn_node)
+enum Node{
+    PackageDef(PackageNode)
+    ImportDef(ImportNode)
+    ModDef(ModeNode)
+    StructDef(StructNode)
+    EnumDef(EnumNode)
+    ClassDef(ClassNode)
+    ExtendDef(ExtendNode)
+    VarDef(VarDefNode)
+    FnDef(FnNode)
 }
 
-struct arg_def {
+struct ArgDef {
     var: bool
-    name: token
+    name: Token
 }
 
-struct fn_def {
-    name: token
+struct FnDef {
+    name: Token
     pub: bool
-    arg: ?[arg_node] = None
+    arg: ?[ArgNode] = None
 }

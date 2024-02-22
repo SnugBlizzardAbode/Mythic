@@ -1,16 +1,15 @@
-use package::token::{token, tokentype}
+use package::token::{Token, TokenType}
 
-fn main(content: string)!{
-    let std_indent = tokenizer{content}.parse_indent()?
-    let tokens = tokenizer{content}.run(std_indent)?
+fn main(content: string)LexerErr!{
+    let tokens = Tokenizer{content}.run()?
+
 }
 
-class tokenizer {
+class Tokenizer {
     struct 
     { 
         content: string
-        std_indent: u32 = 4
-        token: ?[token] = none
+        token: ?[Token] = none
         line: i64 = 0
         char: i64 = 0
     }
