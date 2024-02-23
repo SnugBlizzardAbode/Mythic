@@ -5,9 +5,9 @@ import lexer, token, parser, error
 enum BmcErr {
     List(ListErr)
     File(FileErr)
-    Lexer(LexerErr)
-    Tree(TreeErr)
-    Ast(AstErr)
+    Lexer(lexer::LexerErr)
+    Tree(parser::tree::TreeErr)
+    Ast(parser::ast::AstErr)
     Other
     Arg
 }
@@ -57,7 +57,7 @@ enum Optimize {
 struct Config {
     isa: Isa
     os: Platform
-    optimization: Optimize
+    optimize: Optimize
     output_loc: ?Path
 }
 

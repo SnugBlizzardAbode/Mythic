@@ -1,5 +1,9 @@
 use package::token::{Token, TokenType}
 
+enum LexerErr {
+
+}
+
 fn main(content: string)LexerErr!{
     let tokens = Tokenizer{content}.run()?
 
@@ -12,6 +16,10 @@ class Tokenizer {
         token: ?[Token] = none
         line: i64 = 0
         char: i64 = 0
+    }
+
+    fn run() LexerErr![Token]{
+        
     }
 }
     
