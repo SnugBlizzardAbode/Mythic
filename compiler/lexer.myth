@@ -1,24 +1,24 @@
-use package::token::{Token, TokenType}
+use package::token
 
 enum LexerErr {
-
+    FileErr(os::FileErr)
 }
 
-fn main(content: string)LexerErr!{
-    let tokens = Tokenizer{content}.run()?
-
+fn scan(file: Path) LexerErr![Token] {
+    let src = os::read_file(file).catch(|e|LexerErr.FileErr(e))
+    let token = Tokenizer{src}.scan()?
+    token
 }
 
 class Tokenizer {
-    struct 
-    { 
-        content: string
+    struct { 
+        src: String
         token: ?[Token] = none
         line: i64 = 0
         char: i64 = 0
     }
 
-    fn run() LexerErr![Token]{
+    fn scan(var self) LexerErr![Token] {
         
     }
 }

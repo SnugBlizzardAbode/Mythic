@@ -4,7 +4,7 @@ import lexer, token, parser, error
 
 enum BmcErr {
     List(ListErr)
-    File(FileErr)
+    File(os::FileErr)
     Lexer(lexer::LexerErr)
     Tree(parser::tree::TreeErr)
     Ast(parser::ast::AstErr)
@@ -14,7 +14,7 @@ enum BmcErr {
 
 fn main()BmcErr! { 
     let setting = sys::argv
-    let param = setting[1].catch(|e|BmcErr.list(e))
+    let param = setting[1].catch(|e|BmcErr.List(e))
     match param {
         "-help" => return option()
         "-h" => return option()
@@ -22,17 +22,17 @@ fn main()BmcErr! {
         "-v" => return version()
         _ =>
     }
-    let content = os::read_file(param, 'utf8').catch(|e|BmcErr.file(e))
-    let token = lexer::main(content).catch(|e|BmcErr.lexer(e))
-    let tree = parser::tree::main(token).catch(|e|BmcErr.tree(e))
-    let ast = parser::ast::parse(tree).catch(|e|BmcErr.ast(e))
+    let file = os::Path.from(param)
+    let token = lexer::scan(file).catch(|e|BmcErr.Lexer(e))
+    let tree = parser::tree::main(token).catch(|e|BmcErr.Tree(e))
+    let ast = parser::ast::parse(tree).catch(|e|BmcErr.Ast(e))
     let ir = ir::translate(ast)
     var arg = (
         setting
-        .del(0).catch(|_|BmcErr.other)
-        .del(0).catch(|_|BmcErr.other)
+        .del(0).catch(|_|BmcErr.Other)
+        .del(0).catch(|_|BmcErr.Other)
     )
-    let conf = configure(arg).catch(|_|BmcErr.arg)
+    let conf = configure(arg).catch(|_|BmcErr.Arg)
 }
 
 enum Isa {
@@ -61,4 +61,6 @@ struct Config {
     output_loc: ?Path
 }
 
-fn configure(arg: [string], conf: ?Config = None) !Config {}
+fn configure(arg: [string], conf: ?Config = None) !Config {
+
+}

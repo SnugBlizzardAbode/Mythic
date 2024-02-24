@@ -6,29 +6,29 @@ struct Token {
 }
 
 enum TokenType {
-# operators
-    l_paren, r_paren, l_brace, r_brace, l_curly
-    r_curly, l_vec, r_vec, l_slash, r_slash
-    comma, underscore, semicolon, dot, currency
+# Operators
+    LParen, RParen, LBrace, RBrace, LCurly
+    RCurly, LVec, RVec, LSlash, RSlash
+    Comma, Underscore, Semicolon, Dot, Currency
 
-    eq, eqeq, eqr_vec, plus, plusplus, pluseq
-    minus, minusminus, minuseq, lesseq, greateq
-    star, starstar, exclam, noteq, indent, dedent
-    colon, pathsep
+    Eq, EqEq, EqRVec, Plus, PlusPlus, PlusEq
+    Minus, MinusMinus, MinusEq, LessEq, GreatEq
+    Star, StarStar, Exclam, NotEq, Colon, PathSep
 
-# literals
-    identifier, string, int, float 
-    byte, hexadecimal 
+# Literals
+    Identifier, String, Int, Float 
+    Byte, Hexadecimal 
 
-# keywords
-    kw_and, kw_as, kw_wait, kw_break
-    kw_class, kw_const, kw_continue, kw_elif
-    kw_else, kw_enum, kw_extend, kw_false
-    kw_fn, kw_for, kw_global, kw_if, kw_in
-    kw_import, kw_let, kw_match, kw_mod
-    kw_or, kw_package, kw_pub, kw_return
-    kw_selfvalue, kw_selftype, kw_static
-    kw_struct, kw_throw, kw_true, kw_use
-    kw_var, kw_while
+# Keywords
+    KwAnd, KwAs, KwWait, KwBreak
+    KwClass, KwConst, KwContinue, KwElif
+    KwElse, KwEnum, KwExtend, KwFalse
+    KwFn, KwFor, KwGlobal, KwIf, KwIn
+    KwImport, KwLet, KwMatch, KwMod
+    KwOr, KwPackage, KwPub, KwReturn
+    KwSelfValue, KwSelfType, KwStatic
+    KwStruct, KwThrow, KwTrue, KwUse
+    KwVar, KwWhile
 }
+
 
