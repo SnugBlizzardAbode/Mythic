@@ -2,7 +2,6 @@ struct Token {
     type: TokenType
     literal: ?string
     line: u32
-    file: string
 }
 
 enum TokenType {
@@ -10,6 +9,7 @@ enum TokenType {
     LParen, RParen, LBrace, RBrace, LCurly
     RCurly, LVec, RVec, LSlash, RSlash
     Comma, Underscore, Semicolon, Dot, Currency
+    Ref, At
 
     Eq, EqEq, EqRVec, Plus, PlusPlus, PlusEq
     Minus, MinusMinus, MinusEq, LessEq, GreatEq

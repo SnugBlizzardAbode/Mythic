@@ -1,26 +1,55 @@
 use package::token
 
 enum LexerErr {
-    FileErr(os::FileErr)
+    File(os::FileErr)
+    Array(std::ArrayErr)
+    BadChar(String)
 }
 
 fn scan(file: Path) LexerErr![Token] {
-    let src = os::read_file(file).catch(|e|LexerErr.FileErr(e))
-    let token = Tokenizer{src}.scan()?
+    let src = os::read_file(file).catch(|e|LexerErr.File(e)).char()
+    let token = Tokenizer{src, file}.scan()?
     token
 }
 
 class Tokenizer {
     struct { 
-        src: String
+        src: [String]
+        file: Path
         token: ?[Token] = none
         line: i64 = 0
         char: i64 = 0
     }
 
-    fn scan(var self) LexerErr![Token] {
-        
+    fn scan(var self) LexerErr!?[Token] {
+        for var i in self.src { 
+            char = self.src[i].catch(|e|LexerErr.Array(e))
+
+            match char {
+                '$' => self.add_token(TokenType.Currency)
+                ' ' => continue
+                '&' => self.add_token(TokenType.Ref)
+                '@' => self.add_token(TokenType.At)
+                ',' => self.add_token(TokenType.Comma)
+                '_' => self.add_token(TokenType.Underscore)
+                ';' => self.add_token(TokenType.Semicolon)
+                '{' => self.add_token(TokenType.LCurly)
+                '}' => self.add_token(TokenType.RCurly)
+                '[' => self.add_token(TokenType.LBrace)
+                ']' => self.add_token(TokenType.RBrace)
+
+                o => { print(f"Unexpected {o} in file: {self.file}");
+                    throw LexerErr.BadChar(o) }
+            }
+        }
+        self.token
     }
+
+    fn addToken(var self: &var Self, type: TokenType) Self {
+        let token = Token{type, None, self.line}
+        self.token.append(token)
+    } 
+
 }
     
     
