@@ -7,12 +7,12 @@ struct Token {
 enum TokenType {
 # Operators
     LParen, RParen, LBrace, RBrace, LCurly
-    RCurly, LVec, RVec, LSlash, RSlash
-    Comma, Underscore, Semicolon, Dot, Currency
-    Ref, At
+    RCurly, LSlash, RSlash, Comma, Underscore,
+    Semicolon, Dot, Currency, Ref, At, Question 
 
-    Eq, EqEq, EqRVec, Plus, PlusPlus, PlusEq
-    Minus, MinusMinus, MinusEq, LessEq, GreatEq
+    Eq, EqEq, EqRVec, Plus, PlusPlus,
+    PlusEq, Minus, MinusMinus, MinusEq,
+    Less, LessEq, Great, GreatEq
     Star, StarStar, Exclam, NotEq, Colon, PathSep
 
 # Literals

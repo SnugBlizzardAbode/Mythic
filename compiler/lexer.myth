@@ -22,15 +22,18 @@ class Tokenizer {
     }
 
     fn scan(var self) LexerErr!?[Token] {
-        for var i in self.src { 
+        for var i in self.src.range() { 
             char = self.src[i].catch(|e|LexerErr.Array(e))
 
             match char {
+                # No context tokens
                 '$' => self.add_token(TokenType.Currency)
                 ' ' => continue
                 '&' => self.add_token(TokenType.Ref)
                 '@' => self.add_token(TokenType.At)
+                '?' => self.add_token(TokenType.Question)
                 ',' => self.add_token(TokenType.Comma)
+                '.' => self.add_token(TokenType.Dot)
                 '_' => self.add_token(TokenType.Underscore)
                 ';' => self.add_token(TokenType.Semicolon)
                 '{' => self.add_token(TokenType.LCurly)
@@ -38,8 +41,35 @@ class Tokenizer {
                 '[' => self.add_token(TokenType.LBrace)
                 ']' => self.add_token(TokenType.RBrace)
 
-                o => { print(f"Unexpected {o} in file: {self.file}");
-                    throw LexerErr.BadChar(o) }
+                # context based tokens
+                '#' => 
+                ':' => { if self.expect(':', i + 1) {
+                        i++; self.add_token(TokenType.PathSep)
+                    } else {self.add_token(TokenType.Colon) }
+                }
+                '+' => { if self.expect('+', i + 1) {
+                        i++; self.add_token(TokenType.PlusPlus)
+                    } elif self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.PlusEq)
+                    } else { self.add_token(TokenType.Plus)} 
+                }
+                '-' => { if self.expect('-', i + 1) {
+                        i++; self.add_token(TokenType.MinusMinus)
+                    } elif self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.MinusEq)
+                    } else { self.add_token(TokenType.Minus) } 
+                }
+                '<' => { if self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.LessEq)
+                    } else { self.add_token(TokenType.Less) } 
+                }
+                '>' => { if self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.GreatEq)
+                    } else { self.add_token(TokenType.Great) } 
+                }
+                o => { 
+                    
+                }
             }
         }
         self.token
@@ -50,6 +80,12 @@ class Tokenizer {
         self.token.append(token)
     } 
 
+    fn expect(self, wish: String, index: i64) bool {
+        match self.src[index] {
+            Ok(o) => if o == wish {True} else {False}
+            Err(_) => False
+        }
+    }
 }
     
     
