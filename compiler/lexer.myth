@@ -68,7 +68,7 @@ class Tokenizer {
                     } else { self.add_token(TokenType.Great) } 
                 }
                 o => { 
-                    
+                    # Handle identifiers, numbers, hexadecimal and byte literals
                 }
             }
         }
