@@ -12,11 +12,11 @@ enum Node{
 
 struct ArgDef {
     mutable: bool
-    name: Token
+    name: String
 }
 
 struct FnDef {
-    name: Token
+    name: String
     public: bool
     arg: ?[ArgNode] = None
 }

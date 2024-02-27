@@ -67,6 +67,18 @@ class Tokenizer {
                         i++; self.add_token(TokenType.GreatEq)
                     } else { self.add_token(TokenType.Great) } 
                 }
+                '=' => { if self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.EqEq)
+                    } else { self.add_token(TokenType.Eq) } 
+                }
+                '!' => { if self.expect('=', i + 1) {
+                        i++; self.add_token(TokenType.NotEq)
+                    } else { self.add_token(TokenType.Exlam) } 
+                }
+                '*' => { if self.expect('*', i + 1) {
+                        i++; self.add_token(TokenType.StarStar)
+                    } else { self.add_token(TokenType.Star) } 
+                }
                 o => { 
                     # Handle identifiers, numbers, hexadecimal and byte literals
                 }
@@ -75,14 +87,14 @@ class Tokenizer {
         self.token
     }
 
-    fn addToken(var self: &var Self, type: TokenType) Self {
+    fn add_token(var self: &var Self, type: TokenType) {
         let token = Token{type, None, self.line}
         self.token.append(token)
     } 
 
-    fn expect(self, wish: String, index: i64) bool {
+    fn expect(self, expec: String, index: i64) bool {
         match self.src[index] {
-            Ok(o) => if o == wish {True} else {False}
+            Ok(o) => if o == expec {True} else {False}
             Err(_) => False
         }
     }
