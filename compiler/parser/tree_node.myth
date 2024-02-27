@@ -1,6 +1,6 @@
 enum Node{
-    PackageDef(PackageNode)
-    ImportDef(ImportNode)
+    PackageDef { item: [] }
+    ImportDef { item: [Path] }
     ModDef(ModeNode)
     StructDef(StructNode)
     EnumDef(EnumNode)
@@ -8,6 +8,10 @@ enum Node{
     ExtendDef(ExtendNode)
     VarDef(VarDefNode)
     FnDef(FnNode)
+}
+
+struct PackageNode {
+
 }
 
 struct ArgDef {
@@ -20,3 +24,4 @@ struct FnDef {
     public: bool
     arg: ?[ArgNode] = None
 }
+

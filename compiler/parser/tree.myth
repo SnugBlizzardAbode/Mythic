@@ -5,17 +5,18 @@ use package:: {
 
 enum TreeErr {
     EmptyProgram
+    Lexer(package::lexer::LexerErr)
     Err # placeholder
 }
 
-fn parse_main(token: [Token], file: Path) {
+fn parse_main(token: [Token], file: Path) TreeErr![Node] {
     token[0].catch(|_|TreeErr.EmptyProgram)
     let root = (
         Parser{ token, file }
         .create_tree()
         .catch(|_|TreeErr.Err)
     )
-    parse_import(root)
+    parse_import(root)?
 }
 
 class Parser { 
