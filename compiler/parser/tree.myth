@@ -1,0 +1,32 @@
+use package:: {
+    parser::tree_node
+    token
+}
+
+enum TreeErr {
+    EmptyProgram
+    Err # placeholder
+}
+
+fn parse_main(token: [Token], file: Path) {
+    token[0].catch(|_|TreeErr.EmptyProgram)
+    let root = (
+        Parser{ token, file }
+        .create_tree()
+        .catch(|_|TreeErr.Err)
+    )
+    parse_import(root)
+}
+
+class Parser { 
+    struct {
+        src: [Token] 
+        file: Path
+        tree: [Node] = [] 
+    }
+
+    fn create_tree(self) TreeErr![Node] {
+         
+    }
+
+}

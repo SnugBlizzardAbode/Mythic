@@ -24,7 +24,7 @@ fn main()BmcErr! {
     }
     let file = os::Path.from(param)
     let token = lexer::scan(file).catch(|e|BmcErr.Lexer(e))
-    let tree = parser::tree::main(token).catch(|e|BmcErr.Tree(e))
+    let tree = parser::tree::parse_main(token).catch(|e|BmcErr.Tree(e))
     let ast = parser::ast::parse(tree).catch(|e|BmcErr.Ast(e))
     let ir = ir::translate(ast)
     var arg = (

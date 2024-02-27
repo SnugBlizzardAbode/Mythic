@@ -2,7 +2,7 @@ use package::token
 
 enum LexerErr {
     File(os::FileErr)
-    Array(std::ArrayErr)
+    List(ListErr)
     BadChar(String)
 }
 
@@ -16,14 +16,14 @@ class Tokenizer {
     struct { 
         src: [String]
         file: Path
-        token: ?[Token] = none
+        token: [Token] = []
         line: i64 = 0
         char: i64 = 0
     }
 
     fn scan(var self) LexerErr!?[Token] {
         for var i in self.src.range() { 
-            char = self.src[i].catch(|e|LexerErr.Array(e))
+            char = self.src[i].catch(|e|LexerErr.List(e))
 
             match char {
                 # No context tokens
