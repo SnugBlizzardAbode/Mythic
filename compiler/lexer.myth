@@ -112,7 +112,7 @@ class Tokenizer {
             char = self.next()
             match char {
                 '\n' => {self.line++; return}
-                '\r\n' => `{self.line++; return}
+                '\r\n' => {self.line++; return}
                 _ => continue
             }
         }
