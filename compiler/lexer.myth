@@ -19,11 +19,13 @@ class Tokenizer {
         token: [Token] = []
         line: i64 = 0
         char: i64 = 0
+        length: i64 = 0
     }
 
     fn scan(var self) LexerErr!?[Token] {
-        for var i in self.src.range() { 
-            char = self.src[i].catch(|e|LexerErr.List(e))
+        self.length = self.src.range()
+        while not self.is_end() { 
+            char = self.next()
 
             match char {
                 # No context tokens
@@ -42,43 +44,43 @@ class Tokenizer {
                 ']' => self.add_token(TokenType.RBrace)
 
                 # context based tokens
-                '#' => 
-                ':' => { if self.expect(':', i + 1) {
+                ':' => { if self.expect(':') {
                         i++; self.add_token(TokenType.PathSep)
                     } else {self.add_token(TokenType.Colon) }
                 }
-                '+' => { if self.expect('+', i + 1) {
+                '+' => { if self.expect('+') {
                         i++; self.add_token(TokenType.PlusPlus)
-                    } elif self.expect('=', i + 1) {
+                    } elif self.expect('=') {
                         i++; self.add_token(TokenType.PlusEq)
                     } else { self.add_token(TokenType.Plus)} 
                 }
-                '-' => { if self.expect('-', i + 1) {
+                '-' => { if self.expect('-') {
                         i++; self.add_token(TokenType.MinusMinus)
-                    } elif self.expect('=', i + 1) {
+                    } elif self.expect('=') {
                         i++; self.add_token(TokenType.MinusEq)
                     } else { self.add_token(TokenType.Minus) } 
                 }
-                '<' => { if self.expect('=', i + 1) {
+                '<' => { if self.expect('=') {
                         i++; self.add_token(TokenType.LessEq)
                     } else { self.add_token(TokenType.Less) } 
                 }
-                '>' => { if self.expect('=', i + 1) {
+                '>' => { if self.expect('=') {
                         i++; self.add_token(TokenType.GreatEq)
                     } else { self.add_token(TokenType.Great) } 
                 }
-                '=' => { if self.expect('=', i + 1) {
+                '=' => { if self.expect('=') {
                         i++; self.add_token(TokenType.EqEq)
                     } else { self.add_token(TokenType.Eq) } 
                 }
-                '!' => { if self.expect('=', i + 1) {
+                '!' => { if self.expect('=') {
                         i++; self.add_token(TokenType.NotEq)
                     } else { self.add_token(TokenType.Exlam) } 
                 }
-                '*' => { if self.expect('*', i + 1) {
+                '*' => { if self.expect('*') {
                         i++; self.add_token(TokenType.StarStar)
                     } else { self.add_token(TokenType.Star) } 
                 }
+                '#' => { self.line_comment() } 
                 o => { 
                     # Handle identifiers, numbers, hexadecimal and byte literals
                 }
@@ -87,15 +89,40 @@ class Tokenizer {
         self.token
     }
 
+    fn next(var self: &var Self) String {
+        char = self.src[self.char]
+        self.char++
+        char
+    }
+
     fn add_token(var self: &var Self, type: TokenType) {
         let token = Token{type, None, self.line}
         self.token.append(token)
     } 
 
-    fn expect(self, expec: String, index: i64) bool {
-        match self.src[index] {
-            Ok(o) => if o == expec {True} else {False}
-            Err(_) => False
+    fn expect(self, expec: String) bool {
+        if not is_end() {
+            if self.src[self.char] == expec { True}
+            Else {False}
+        } else {False}
+    }
+
+    fn line_comment(var self: &var Self) {
+        while not self.is_end() {
+            char = self.next()
+            match char {
+                '\n' => {self.line++; return}
+                '\r\n' => `{self.line++; return}
+                _ => continue
+            }
+        }
+    }
+
+    fn is_end(self) bool {
+        if self.char >= self.length {
+            True
+        } Else {
+            False
         }
     }
 }
