@@ -1,7 +1,4 @@
-use package:: {
-    parser::tree_node
-    token
-}
+use package::{parser::tree_node, token}
 
 enum TreeErr {
     EmptyProgram
@@ -10,13 +7,13 @@ enum TreeErr {
 }
 
 fn parse_main(token: [Token], file: Path) TreeErr![Node] {
-    token[0].catch(|_|TreeErr.EmptyProgram)
+    token.get(0).catch(|_|TreeErr.EmptyProgram)
     let root = (
-        Parser{ token, file }
+        Parser{token, file}
         .create_tree()
         .catch(|_|TreeErr.Err)
     )
-    parse_import(root)?
+    package::parser::imports::parse_import(root)?
 }
 
 class Parser { 
