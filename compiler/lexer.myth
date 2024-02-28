@@ -17,7 +17,7 @@ class Tokenizer {
         src: [String]
         file: Path
         token: [Token] = []
-        line: i64 = 0
+        line: u32 = 0
         char: i64 = 0
         length: i64 = 0
     }
