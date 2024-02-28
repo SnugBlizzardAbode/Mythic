@@ -1,6 +1,6 @@
 package os, sys
 import lexer, token, parser, error
-
+$unchecked_list_access
 
 enum BmcErr {
     List(ListErr)
@@ -14,7 +14,7 @@ enum BmcErr {
 
 fn main()BmcErr! { 
     let setting = sys::argv
-    let param = setting[1].catch(|e|BmcErr.List(e))
+    let param = setting.get(1).catch(|e|BmcErr.List(e))
     match param {
         "-help" => return option()
         "-h" => return option()
@@ -29,8 +29,8 @@ fn main()BmcErr! {
     let ir = ir::translate(ast)
     var arg = (
         setting
-        .del(0).catch(|_|BmcErr.Other)
-        .del(0).catch(|_|BmcErr.Other)
+        .del(0).panic()
+        .del(0).panic()
     )
     let conf = configure(arg).catch(|_|BmcErr.Arg)
 }
