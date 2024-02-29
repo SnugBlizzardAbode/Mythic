@@ -80,7 +80,9 @@ class Tokenizer {
                         i++; self.add_token(TokenType.StarStar)
                     } else { self.add_token(TokenType.Star) } 
                 }
-                '#' => { self.line_comment() } 
+                '"' => self.string_literal('"')
+                "'" => self.string_literal("'")
+                '#' => self.line_comment() 
                 o => { 
                     # Handle identifiers, numbers, hexadecimal and byte literals
                 }
@@ -100,6 +102,11 @@ class Tokenizer {
         self.token.append(token)
     } 
 
+    fn add_lit_token(var self: &var Self, type: TokenType, lit: String) {
+        let token = Token {type, lit, self.line}
+        self.token.append(token)
+    }
+
     fn expect(self, expec: String) bool {
         if not is_end() {
             if self.src[self.char] == expec { True}
@@ -115,6 +122,15 @@ class Tokenizer {
                 '\r\n' => {self.line++; return}
                 _ => continue
             }
+        }
+    }
+
+    fn string_literal(var self: &var Self, quote: String) {
+        var literal = ""
+        while not self.is_end() {
+            char = self.next()
+            if char == quote { self.add_lit_token() }
+            else { literal += char}
         }
     }
 
