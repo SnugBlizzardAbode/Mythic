@@ -22,76 +22,83 @@ class Tokenizer {
         length: i64 = 0
     }
 
-    fn scan(var self) LexerErr!?[Token] {
+    fn scan(var self) LexerErr![Token] {
         self.length = self.src.range()
-        while not self.is_end() { 
-            char = self.next()
-
-            match char {
-                # No context tokens
-                '$' => self.add_token(TokenType.Currency)
-                ' ' => continue
-                '&' => self.add_token(TokenType.Ref)
-                '@' => self.add_token(TokenType.At)
-                '?' => self.add_token(TokenType.Question)
-                ',' => self.add_token(TokenType.Comma)
-                '.' => self.add_token(TokenType.Dot)
-                '_' => self.add_token(TokenType.Underscore)
-                ';' => self.add_token(TokenType.Semicolon)
-                '{' => self.add_token(TokenType.LCurly)
-                '}' => self.add_token(TokenType.RCurly)
-                '[' => self.add_token(TokenType.LBrace)
-                ']' => self.add_token(TokenType.RBrace)
-
-                # context based tokens
-                ':' => { if self.expect(':') {
-                        i++; self.add_token(TokenType.PathSep)
-                    } else {self.add_token(TokenType.Colon) }
-                }
-                '+' => { if self.expect('+') {
-                        i++; self.add_token(TokenType.PlusPlus)
-                    } elif self.expect('=') {
-                        i++; self.add_token(TokenType.PlusEq)
-                    } else { self.add_token(TokenType.Plus)} 
-                }
-                '-' => { if self.expect('-') {
-                        i++; self.add_token(TokenType.MinusMinus)
-                    } elif self.expect('=') {
-                        i++; self.add_token(TokenType.MinusEq)
-                    } else { self.add_token(TokenType.Minus) } 
-                }
-                '<' => { if self.expect('=') {
-                        i++; self.add_token(TokenType.LessEq)
-                    } else { self.add_token(TokenType.Less) } 
-                }
-                '>' => { if self.expect('=') {
-                        i++; self.add_token(TokenType.GreatEq)
-                    } else { self.add_token(TokenType.Great) } 
-                }
-                '=' => { if self.expect('=') {
-                        i++; self.add_token(TokenType.EqEq)
-                    } else { self.add_token(TokenType.Eq) } 
-                }
-                '!' => { if self.expect('=') {
-                        i++; self.add_token(TokenType.NotEq)
-                    } else { self.add_token(TokenType.Exlam) } 
-                }
-                '*' => { if self.expect('*') {
-                        i++; self.add_token(TokenType.StarStar)
-                    } else { self.add_token(TokenType.Star) } 
-                }
-                '"' => self.string_literal('"')
-                "'" => self.string_literal("'")
-                '#' => self.line_comment() 
-                o => { 
-                    # Handle identifiers, numbers, hexadecimal and byte literals
-                }
-            }
+        while not self.is_end() {
+            self.next_lexeme(True)?
         }
         self.token
     }
 
-    fn next(var self: &var Self) String {
+    fn next_lexeme(var self: &var Self, line_aware: bool) LexerErr! { 
+        char = self.advance()
+
+        match char {
+            # No context tokens
+            '$' => self.add_token(TokenType.Currency)
+            ' ' => continue
+            '&' => self.add_token(TokenType.Ref)
+            '@' => self.add_token(TokenType.At)
+            '?' => self.add_token(TokenType.Question)
+            ',' => self.add_token(TokenType.Comma)
+            '.' => self.add_token(TokenType.Dot)
+            '_' => self.add_token(TokenType.Underscore)
+            ';' => self.add_token(TokenType.Semicolon)
+            '{' => self.add_token(TokenType.LCurly)
+            '}' => self.add_token(TokenType.RCurly)
+            '[' => self.add_token(TokenType.LBrace)
+            ']' => self.add_token(TokenType.RBrace)
+
+            # context based tokens
+            ':' => { if self.expect(':') {
+                    i++; self.add_token(TokenType.PathSep)
+                } else {self.add_token(TokenType.Colon) }
+            }
+            '+' => { if self.expect('+') {
+                    i++; self.add_token(TokenType.PlusPlus)
+                } elif self.expect('=') {
+                    i++; self.add_token(TokenType.PlusEq)
+                } else { self.add_token(TokenType.Plus)} 
+            }
+            '-' => { if self.expect('-') {
+                    i++; self.add_token(TokenType.MinusMinus)
+                } elif self.expect('=') {
+                    i++; self.add_token(TokenType.MinusEq)
+                } else { self.add_token(TokenType.Minus) } 
+            }
+            '<' => { if self.expect('=') {
+                    i++; self.add_token(TokenType.LessEq)
+                } else { self.add_token(TokenType.Less) } 
+            }
+            '>' => { if self.expect('=') {
+                    i++; self.add_token(TokenType.GreatEq)
+                } else { self.add_token(TokenType.Great) } 
+            }
+            '=' => { if self.expect('=') {
+                    i++; self.add_token(TokenType.EqEq)
+                } else { self.add_token(TokenType.Eq) } 
+            }
+            '!' => { if self.expect('=') {
+                    i++; self.add_token(TokenType.NotEq)
+                } else { self.add_token(TokenType.Exlam) } 
+            }
+            '*' => { if self.expect('*') {
+                    i++; self.add_token(TokenType.StarStar)
+                } else { self.add_token(TokenType.Star) } 
+            }
+            '"' => self.string_literal('"')
+            "'" => self.string_literal("'")
+            '(' => self.paren()
+            ')' => throw LexerErr.BadChar(char)
+            '#' => self.line_comment() 
+            o => { 
+                if is_digit(o){ self.number(o)}
+                else self.parse_word(o)
+            }
+        }
+    }
+
+    fn advance(var self: &var Self) String {
         char = self.src[self.char]
         self.char++
         char
@@ -116,7 +123,7 @@ class Tokenizer {
 
     fn line_comment(var self: &var Self) {
         while not self.is_end() {
-            char = self.next()
+            char = self.advance()
             match char {
                 '\n' => {self.line++; return}
                 '\r\n' => {self.line++; return}
@@ -125,12 +132,35 @@ class Tokenizer {
         }
     }
 
+    fn paren(var self: &var Self) LexerErr! {
+        self.add_token(TokenType.LParen)
+        while not self.is_end() {
+            if self.peek() == ')' {
+                self.char++
+                self.add_token(TokenType.RParen)
+                break
+            }
+            self.next_lexeme(False)?
+        }
+    }
+
+    fn peek(self, char: String) bool {
+        if self.src[self.char] == char {
+            True
+        } Else { False }
+    }
+
     fn string_literal(var self: &var Self, quote: String) {
         var literal = ""
         while not self.is_end() {
-            char = self.next()
+            char = self.advance()
             if char == quote { self.add_lit_token() }
-            else { literal += char}
+            else {
+                if char in ['\n', '\r\n']{
+                    self.line++
+                }
+                literal += char
+            }
         }
     }
 
