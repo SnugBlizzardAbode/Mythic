@@ -1,4 +1,4 @@
-enum Node{
+enum Node {
     PackageDef { item: [ModPath] }
     ImportDef { item: [Path] }
     ModDef { item: [Node] }

@@ -23,7 +23,7 @@ enum TokenType {
     KwAnd, KwAs, KwWait, KwBreak
     KwClass, KwConst, KwContinue, KwElif
     KwElse, KwEnum, KwExtend, KwFalse
-    KwFn, KwFor, KwGlobal, KwIf, KwIn
+    KwFn, KwFor, KwIf, KwIn
     KwImport, KwLet, KwMatch, KwMod
     KwOr, KwPackage, KwPub, KwReturn
     KwSelfValue, KwSelfType, KwStatic
