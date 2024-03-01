@@ -224,6 +224,10 @@ class Tokenizer {
             char == '_'
         )
 
+    fn number(var self: &var Self, first: String) {
+
+    }
+
     fn is_end(self) bool {
         self.char >= self.length
     }
