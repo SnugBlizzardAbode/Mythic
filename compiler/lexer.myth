@@ -50,6 +50,8 @@ class Tokenizer {
             ']' => self.add_token(TokenType.RBrace)
 
             # context based tokens
+            '\n' => { if line_aware {self.add_token(TokenType.Semicolon)}}
+            '\r\n' => { if line_aware {self.add_token(TokenType.Semicolon)}}
             ':' => { if self.expect(':') {
                     i++; self.add_token(TokenType.PathSep)
                 } else {self.add_token(TokenType.Colon) }
