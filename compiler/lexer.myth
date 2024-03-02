@@ -225,7 +225,34 @@ class Tokenizer {
         )
 
     fn number(var self: &var Self, first: String) {
-
+        if self.is_end() {
+            self.add_lit_token(TokenType.Int, first)
+            return
+        }
+        let sec = self.src[self.char]
+        var literal = first + sec 
+        if first == '0' {
+            match sec {
+                'x' => return self.hexadecimal()
+                'b' => return self.binary()
+                o => ()
+            }
+        } elif first == '.' {
+            return self.float(literal)
+        } elif not is_digit(sec) {
+            return self.add_lit_token(TokenType.Int, first)
+        }
+        while not self.is_end() {
+            char = self.advance()
+            if not is_digit(char) and not char == '.' {
+                break
+            }
+            match char {
+                '.' => return self.float(literal + char)
+                o => literal += char
+            }
+        }
+        self.add_lit_token(TokenType.Int, literal)
     }
 
     fn is_end(self) bool {
