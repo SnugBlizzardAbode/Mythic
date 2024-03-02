@@ -51,8 +51,8 @@ class Tokenizer {
 
             # context based tokens
             '\n' => {
-                let prev = self.token.get(-1)
-                if line_aware and prev {
+                let prev = self.token.get(-1).or_return()
+                if line_aware {
                     match prev.type {
                         TokenType.Semicolon => ()
                         _ => return
@@ -61,7 +61,7 @@ class Tokenizer {
                 }
             }
             '\r\n' => {
-                let prev = self.token.get(-1)
+                let prev = self.token.get(-1).or_return()
                 if line_aware and prev {
                     match prev.type {
                         TokenType.Semicolon => ()
