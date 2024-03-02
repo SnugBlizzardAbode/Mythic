@@ -237,13 +237,11 @@ class Tokenizer {
                 'b' => return self.binary()
                 o => ()
             }
-        } elif first == '.' {
-            return self.float(literal)
         } elif not is_digit(sec) {
             return self.add_lit_token(TokenType.Int, first)
         }
         while not self.is_end() {
-            char = self.advance()
+            char = self.src[self.char]
             if not is_digit(char) and not char == '.' {
                 break
             }
@@ -251,8 +249,13 @@ class Tokenizer {
                 '.' => return self.float(literal + char)
                 o => literal += char
             }
+            self.char++
         }
         self.add_lit_token(TokenType.Int, literal)
+    }
+
+    fn float(var self: &var Self, var literal: String) {
+        
     }
 
     fn is_end(self) bool {
