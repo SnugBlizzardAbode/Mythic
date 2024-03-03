@@ -275,7 +275,13 @@ class Tokenizer {
     }
 
     fn float(var self: &var Self, var literal: String) {
-        
+        while not self.is_end() {
+            char = self.src[self.char]
+            if not is_digit(char) {break}
+            literal += char
+            self.char++
+        }
+        self.add_lit_token(TokenType.Float, literal)
     }
 
     fn is_end(self) bool {
