@@ -1,5 +1,9 @@
 package os, sys
 import lexer, token, parser, error
+
+# By default accessing an index of an uknown sized list will return result
+# This changes it to access it with no safeguards.
+# Program panics if index doesn't exist
 $unchecked_list_access
 
 enum BmcErr {
@@ -24,14 +28,15 @@ fn main()BmcErr! {
     }
     let file = os::Path.from(param)
     let token = lexer::scan(file).catch(|e|BmcErr.Lexer(e))
+
+    # Parse tree converts a list of tokens/words in Mythic
+    # into a tree of theoretically correct sentences.
     let tree = parser::tree::parse_main(token).catch(|e|BmcErr.Tree(e))
+
+    # The ast verifies the validity of sentences
     let ast = parser::ast::parse(tree).catch(|e|BmcErr.Ast(e))
     let ir = ir::translate(ast)
-    var arg = (
-        setting
-        .del(0).panic()
-        .del(0).panic()
-    )
+    var arg = setting.del(0).del(0)
     let conf = configure(arg).catch(|_|BmcErr.Arg)
 }
 
@@ -61,6 +66,9 @@ struct Config {
     output_loc: ?Path
 }
 
+
+# Todo
+# Will parse settings passed to compiler
 fn configure(arg: [string], conf: ?Config = None) !Config {
 
 }
