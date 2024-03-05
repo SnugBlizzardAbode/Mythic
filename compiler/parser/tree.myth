@@ -9,7 +9,7 @@ enum TreeErr {
 fn parse_main(token: [Token], file: Path) TreeErr![Node] {
     token.get(0).catch(|_|TreeErr.EmptyProgram)
     let root = (
-        Parser{token, file}
+        Parser{token, file, len(token)}
         .create_tree()
         .catch(|_|TreeErr.Err)
     )
@@ -20,11 +20,28 @@ class Parser {
     struct {
         src: [Token] 
         file: Path
+        len: u64
+        current: u64 = 0
         tree: [Node] = [] 
     }
 
     fn create_tree(self) TreeErr![Node] {
-         
+         while not self.is_end {
+            let token = self.advance()
+
+            match token {
+                
+            }
+         }
     }
 
+    fn is_end(self) bool {
+        self.current >= self.len
+    }
+
+    fn advance(var self: &var Self) Token {
+        let token = self.src[self.current]
+        self.current++
+        token
+    }
 }
