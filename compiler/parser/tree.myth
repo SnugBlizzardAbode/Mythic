@@ -3,6 +3,7 @@ use package::{parser::tree_node, token}
 enum TreeErr {
     EmptyProgram
     Lexer(package::lexer::LexerErr)
+    BadToken(package::token::TokenType)
     Err # placeholder
 }
 
@@ -28,23 +29,42 @@ class Parser {
     fn create_tree(self) TreeErr![Node] {
          while not self.is_end {
             let token = self.advance()
+            var item: Node? = None
 
             match token.type {
-                KwPackage =>
-                KwImport =>
-                KwPub =>
-                KwMod =>
-                KwFn => 
-                KwClass =>
-                KwExtend =>
-                KwStruct => 
-                KwEnum =>
-                KwLet => 
-                KwVar => 
-                KwStatic => 
-                KwConst =>  
+                KwPackage => item = parse_package()
+                KwImport => item = parse_import()
+                KwPub => item = parse_pub()
+                KwMod => item = mod_def()
+                KwFn => item = fn_def()
+                KwClass => item = class_def()
+                KwExtend => item = extend_node()
+                KwStruct => item = struct_def()
+                KwEnum => item = enum_def()
+                KwLet => item = var_def(False)
+                KwVar => item = var_def(True)
+                KwStatic => item = static_def()
+                KwConst =>  item = const_def()
+                e => throw TreeErr.BadToken(e)
             }
+            self.tree.append(item)
          }
+    }
+
+    fn parse_package() {
+
+    }
+
+    fn parse_import() {
+
+    }
+
+    fn parse_pub() {
+
+    }
+
+    fn mod_def() {
+
     }
 
     fn is_end(self) bool {
