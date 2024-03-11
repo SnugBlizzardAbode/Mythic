@@ -8,9 +8,57 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 
 ```mythic
-let monday = list['😊', '🤨', '🤪', '😴']
-for (emotion in monday)
-    println(emotion)
+mod player
+    enum Mushroom
+    | Blue
+    | Brown
+    | Red
+    ;
+
+    enum State
+    | Mario 
+    | SuperMario
+    | MiniMario
+    | FireMario
+    ;
+
+    class Mario
+        struct {
+        state = State.Mario,
+        coin = 0,
+        }
+
+        fn eat_shroom(var self, shroom)
+            use State
+            match #(self.state,shroom)
+            | #(Mario, Brown) => self.state = SuperMario
+            | #(_, Blue) => self.state = MiniMario
+            | #(_, Red) => self.state = FireMario
+            | #(_, Brown) => 
+            ;
+        ;
+    ; // end class
+; // end module
+
+fn main()
+    let user = player::Mario{}
+    user.eat_shroom(Mushroom.Brown)
+
+    let b = #(1,"ok") // tuple
+    let c = #[1,2,3]  // list creation
+    c[0] // accessing index 
+
+    let d = check::Bar.Yay // enum instance
+    // :: only for accessing modules
+
+    if (condition)
+        // blah
+    elif (condition)
+        // mm
+    else
+        // else uhhh
+    ;
+    "Thanks for all the fish."
 ;
 ```
 <br/>
