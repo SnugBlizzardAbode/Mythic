@@ -1,63 +1,66 @@
 package os, sys
 import lexer, token, parser, error
 
-# By default accessing an index of an uknown sized list will return result
-# This changes it to access it with no safeguards.
-# Program panics if index doesn't exist
+/* 
+ By default accessing an index of an uknown sized list will return result
+ This changes it to access it with no safeguards.
+ Program panics if index doesn't exist
+*/
 $unchecked_list_access
 
-enum BmcErr {
-    List(ListErr)
-    File(os::FileErr)
-    Lexer(lexer::LexerErr)
-    Tree(parser::tree::TreeErr)
-    Ast(parser::ast::AstErr)
-    Other
-    Arg
-}
+enum BmcErr 
+| List(ListErr)
+| File(os::FileErr)
+| Lexer(lexer::LexerErr)
+| Tree(parser::tree::TreeErr)
+| Ast(parser::ast::AstErr)
+| Other
+| Arg
+;
 
-fn main()BmcErr! { 
+// !BmcErr 
+fn main() 
     let setting = sys::argv
-    let param = setting.get(1).catch(|e|BmcErr.List(e))
-    match param {
-        "-help" => return option()
-        "-h" => return option()
-        "-version" => return version()
-        "-v" => return version()
-        _ =>
-    }
+    let param = setting.get(1).catch(fn e=>BmcErr.List(e))
+    match param
+    | "-help" => return option()
+    | "-h" => return option()
+    | "-version" => return version()
+    | "-v" => return version()
+    | _ =>
+    ;
     let file = os::Path.from(param)
-    let token = lexer::scan(file).catch(|e|BmcErr.Lexer(e))
+    let token = lexer::scan(file).catch(fn e=>BmcErr.Lexer(e))
 
-    # Parse tree converts a list of tokens/words in Mythic
-    # into a tree of theoretically correct sentences.
-    let tree = parser::tree::parse_main(token).catch(|e|BmcErr.Tree(e))
+    // Parse tree converts a list of tokens/words in Mythic
+    // into a tree of theoretically correct sentences.
+    let tree = parser::tree::parse_main(token).catch(fn e=>BmcErr.Tree(e))
 
-    # The ast verifies the validity of sentences
-    let ast = parser::ast::parse(tree).catch(|e|BmcErr.Ast(e))
+    // The ast verifies the validity of sentences
+    let ast = parser::ast::parse(tree).catch(fn e=>BmcErr.Ast(e))
     let ir = ir::translate(ast)
     var arg = setting.del(0).del(0)
-    let conf = configure(arg).catch(|_|BmcErr.Arg)
-}
+    let conf = configure(arg).catch(fn _=>BmcErr.Arg)
+;
 
-enum Isa {
-    Riscv
-    X86
-    Armv8
-}
+enum Isa
+| Riscv
+| X86
+| Armv8
+;
 
-enum Platform {
-    Mac
-    Linux
-    Windows
-    Bard
-}
+enum Platform
+| Mac
+| Linux
+| Windows
+| Bard
+;
 
-enum Optimize {
-    Memory
-    Speed
-    Normal
-}
+enum Optimize
+| Memory
+| Speed
+| Normal
+;
 
 struct Config {
     isa: Isa
@@ -67,8 +70,10 @@ struct Config {
 }
 
 
-# Todo
-# Will parse settings passed to compiler
-fn configure(arg: [string], conf: ?Config = None) !Config {
+/* Todo
+ Will parse settings passed to compiler
+*/
+// Config!
+fn configure(arg: [string], conf: ?Config = None)
 
-}
+;

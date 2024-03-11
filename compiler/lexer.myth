@@ -1,291 +1,236 @@
 use package::token
 
-enum LexerErr {
-    File(os::FileErr)
-    List(ListErr)
-    BadChar(String)
-}
+enum LexerErr
+| File(os::FileErr)
+| List(ListErr)
+| BadChar(String)
+;
 
-fn scan(file: Path) LexerErr![Token] {
-    let src = os::read_file(file).catch(|e|LexerErr.File(e)).char()
-    let token = Tokenizer{src, file}.scan()?
-    token
-}
+// [Token]!LexerErr 
+fn scan(file: Path) 
+    let src = os::read_file(file).catch(fn e=>LexerErr.File(e)).char()
+    Tokenizer{src, file}.scan()?
+;
 
-class Tokenizer {
+class Tokenizer
     struct { 
-        src: [String]
-        file: Path
-        token: [Token] = []
-        line: u32 = 0
-        char: i64 = 0
-        length: i64 = 0
+        src: [String],
+        file: Path,
+        token: [Token] = list[],
+        line: u32 = 0,
+        char: i64 = 0,
+        length: i64 = 0,
     }
 
-    fn scan(var self) LexerErr![Token] {
+    // [Token]!LexerErr
+    fn scan(var self)
         self.length = self.src.range()
-        while not self.is_end() {
+        while (not self.is_end())
             self.next_lexeme(True)?
-        }
+        ;
         self.token
-    }
+    ;
 
-    fn next_lexeme(var self: &var Self, line_aware: bool) LexerErr! { 
+    // !LexerErr
+    fn next_lexeme(var self: &var Self, line_aware: bool)
         char = self.advance()
 
-        match char {
-            # No context tokens
-            '$' => self.add_token(TokenType.Currency)
-            ' ' => continue
-            '&' => self.add_token(TokenType.Ref)
-            '@' => self.add_token(TokenType.At)
-            '?' => self.add_token(TokenType.Question)
-            ',' => self.add_token(TokenType.Comma)
-            '.' => self.add_token(TokenType.Dot)
-            '_' => self.add_token(TokenType.Underscore)
-            ';' => self.add_token(TokenType.Semicolon)
-            '{' => self.add_token(TokenType.LCurly)
-            '}' => self.add_token(TokenType.RCurly)
-            '[' => self.add_token(TokenType.LBrace)
-            ']' => self.add_token(TokenType.RBrace)
+        match char 
+        | '$' => self.add_token(TokenType.Currency)
+        | ' ' => continue
+        | '&' => self.add_token(TokenType.Ref)
+        | '@' => self.add_token(TokenType.At)
+        | '?' => self.add_token(TokenType.Question)
+        | ',' => self.add_token(TokenType.Comma)
+        | '.' => self.add_token(TokenType.Dot)
+        | '_' => self.add_token(TokenType.Underscore)
+        | ';' => self.add_token(TokenType.Semicolon)
+        | '{' => self.add_token(TokenType.LCurly)
+        | '}' => self.add_token(TokenType.RCurly)
+        | '[' => self.add_token(TokenType.LBrace)
+        | ']' => self.add_token(TokenType.RBrace)
+        | '\n' => 
+        | '\r\n' => 
+        | '\t' => 
+        | '/' => self.add_token(TokenType.LSlash)
+        | ':' => self.parse_colon()
+        | '+' => self.parse_plus()
+        | '-' => self.parse_minus()
+        | '<' => self.parse_less()
+        | '>' => self.parse_great()
+        | '=' => self.parse_eq()
+        | '!' => self.add_token(TokenType.Exclam)
+        | '*' => self.parse_star()
+        | '"' => self.string_literal('"')
+        | "'" => self.string_literal("'")
+        | '(' => self.add_token(TokenType.LParen)
+        | ')' => self.add_token(TokenType.RParen)
+        | '#' => self.add_token(TokenType.Hash)
+        | o => if (is_digit(o))
+                self.number(o)
+            else 
+                self.parse_word(o)
+        ;
+    ;
 
-            # context based tokens
-            '\n' => {
-                let prev = self.token.get(-1).or_return()
-                if line_aware {
-                    match prev.type {
-                        TokenType.Semicolon => ()
-                        _ => return
-                    }
-                    self.add_token(TokenType.Semicolon)
-                }
-            }
-            '\r\n' => {
-                let prev = self.token.get(-1).or_return()
-                if line_aware and prev {
-                    match prev.type {
-                        TokenType.Semicolon => ()
-                        _ => return
-                    }
-                    self.add_token(TokenType.Semicolon)
-                }
-            }
-            ':' => { if self.expect(':') {
-                    i++; self.add_token(TokenType.PathSep)
-                } else {self.add_token(TokenType.Colon) }
-            }
-            '+' => { if self.expect('+') {
-                    i++; self.add_token(TokenType.PlusPlus)
-                } elif self.expect('=') {
-                    i++; self.add_token(TokenType.PlusEq)
-                } else { self.add_token(TokenType.Plus)} 
-            }
-            '-' => { if self.expect('-') {
-                    i++; self.add_token(TokenType.MinusMinus)
-                } elif self.expect('=') {
-                    i++; self.add_token(TokenType.MinusEq)
-                } else { self.add_token(TokenType.Minus) } 
-            }
-            '<' => { if self.expect('=') {
-                    i++; self.add_token(TokenType.LessEq)
-                } else { self.add_token(TokenType.Less) } 
-            }
-            '>' => { if self.expect('=') {
-                    i++; self.add_token(TokenType.GreatEq)
-                } else { self.add_token(TokenType.Great) } 
-            }
-            '=' => { if self.expect('=') {
-                    i++; self.add_token(TokenType.EqEq)
-                } else { self.add_token(TokenType.Eq) } 
-            }
-            '!' => { if self.expect('=') {
-                    i++; self.add_token(TokenType.NotEq)
-                } else { self.add_token(TokenType.Exlam) } 
-            }
-            '*' => { if self.expect('*') {
-                    i++; self.add_token(TokenType.StarStar)
-                } else { self.add_token(TokenType.Star) } 
-            }
-            '"' => self.string_literal('"')
-            "'" => self.string_literal("'")
-            '(' => self.paren()
-            ')' => throw LexerErr.BadChar(char)
-            '#' => self.line_comment() 
-            o => { 
-                if is_digit(o){self.number(o)}
-                else self.parse_word(o)
-            }
-        }
-    }
-
-    fn advance(var self: &var Self) String {
+    fn advance(var self: &var Self)
         char = self.src[self.char]
         self.char++
         char
-    }
+    ;
 
-    fn add_token(var self: &var Self, type: TokenType) {
+    fn add_token(var self: &var Self, type: TokenType)
         let token = Token{type, None, self.line}
         self.token.append(token)
-    } 
+    ;
 
-    fn add_lit_token(var self: &var Self, type: TokenType, lit: String) {
-        let token = Token {type, lit, self.line}
+    fn add_lit_token(var self: &var Self, type: TokenType, lit: String)
+        let token = Token{type, lit, self.line}
         self.token.append(token)
-    }
+    ;
 
-    fn expect(self, expec: String) bool {
-        if not is_end() {
-            if self.src[self.char] == expec { True}
-            Else {False}
-        } else {False}
-    }
+    fn expect(self, expec: String)
+        if (not is_end())
+            if (self.src{self.char} == expec) 
+                True
+            else
+                False
+        else 
+            False
+        ;
+    ;
 
-    fn line_comment(var self: &var Self) {
-        while not self.is_end() {
-            char = self.advance()
-            match char {
-                '\n' => {self.line++; return}
-                '\r\n' => {self.line++; return}
-                _ => continue
-            }
-        }
-    }
-
-    fn paren(var self: &var Self) LexerErr! {
-        self.add_token(TokenType.LParen)
-        while not self.is_end() {
-            if self.peek() == ')' {
-                self.char++
-                self.add_token(TokenType.RParen)
-                break
-            }
-            self.next_lexeme(False)?
-        }
-    }
-
-    fn peek(self, char: String) bool {
-        if self.src[self.char] == char {
+    fn peek(self, char: String)
+        if (self.src[self.char] == char)
             True
-        } Else { False }
-    }
+        Else
+            False 
+        ;
+    ;
 
-    fn string_literal(var self: &var Self, quote: String) {
+    fn string_literal(var self: &var Self, quote: String)
         var literal = ""
-        while not self.is_end() {
+        while (not self.is_end())
             char = self.advance()
-            if char == quote { self.add_lit_token() }
-            else {
-                if char in ['\n', '\r\n']{
+            if (char == quote)
+                self.add_lit_token()
+            else
+                if (char in list['\n', '\r\n'])
                     self.line++
-                }
+                ;
                 literal += char
-            }
-        }
-    }
+            ;
+        ; // end while
+    ; // end fn
 
-    fn is_digit(char: String) bool {
-        if char >= '0' and char <= '9' {True}
-        else {False}
-    }
+    fn is_digit(char: String)
+        if (char >= '0' and char <= '9')
+            True
+        else
+            False
+        ;
+    ;
 
-    fn parse_word(var self: &var Self, var literal: String) {
-        while not self.is_end() {
+    fn parse_word(var self: &var Self, var literal: String)
+        while (not self.is_end())
             char = self.peek()
-             if not is_alpha(char) and not char == '_' {
+             if (not is_alpha(char) and not char == '_')
                 break
-             }
+             ;
              literal += char
              self.char++
-        }
-        match literal {
-            'and' => self.add_token(TokenType.KwAnd)
-            'as' => self.add_token(TokenType.KwAs)
-            'break' => self.add_token(TokenType.KwBreak)
-            'class' => self.add_token(TokenType.KwClass)
-            'const' => self.add_token(TokenType.KwConst)
-            'continue' => self.add_token(TokenType.KwContinue)
-            'elif' => self.add_token(TokenType.KwElif)
-            'else' => self.add_token(TokenType.KwElse)
-            'enum' => self.add_token(TokenType.KwEnum)
-            'extend' => self.add_token(TokenType.KwExtend)
-            'False' => self.add_token(TokenType.KwFalse)
-            'fn' => self.add_token(TokenType.KwFn)
-            'for' => self.add_token(TokenType.KwFor)
-            'if' => self.add_token(TokenType.KwIf)
-            'import' => self.add_token(TokenType.KwImport)
-            'in' => self.add_token(TokenType.KwIn)
-            'let' => self.add_token(TokenType.KwLet)
-            'match' => self.add_token(TokenType.KwMatch)
-            'mod' => self.add_token(TokenType.KwMod)
-            'or' => self.add_token(TokenType.KwOr)
-            'package' => self.add_token(TokenType.KwPackage)
-            'pub' => self.add_token(TokenType.KwPub)
-            'return' => self.add_token(TokenType.KwReturn)
-            'self' => self.add_token(TokenType.KwSelfValue)
-            'Self' => self.add_token(TokenType.KwSelfType)
-            'static' => self.add_token(TokenType.KwStatic)
-            'struct' => self.add_token(TokenType.KwStruct)
-            'throw' => self.add_token(TokenType.KwThrow)
-            'True' => self.add_token(TokenType.KwTrue)
-            'use' => self.add_token(TokenType.KwUse)
-            'var' => self.add_token(TokenType.KwVar)
-            'wait' => self.add_token(TokenType.KwWait)
-            'while' => self.add_token(TokenType.KwWhile)
-            o => self.add_lit_token(TokenType.Identifier, o)
-        }
-    }
+        ;
+        match literal
+        | 'and' => self.add_token(TokenType.KwAnd)
+        | 'as' => self.add_token(TokenType.KwAs)
+        | 'break' => self.add_token(TokenType.KwBreak)
+        | 'class' => self.add_token(TokenType.KwClass)
+        | 'const' => self.add_token(TokenType.KwConst)
+        | 'continue' => self.add_token(TokenType.KwContinue)
+        | 'elif' => self.add_token(TokenType.KwElif)
+        | 'else' => self.add_token(TokenType.KwElse)
+        | 'enum' => self.add_token(TokenType.KwEnum)
+        | 'extend' => self.add_token(TokenType.KwExtend)
+        | 'False' => self.add_token(TokenType.KwFalse)
+        | 'fn' => self.add_token(TokenType.KwFn)
+        | 'for' => self.add_token(TokenType.KwFor)
+        | 'if' => self.add_token(TokenType.KwIf)
+        | 'import' => self.add_token(TokenType.KwImport)
+        | 'in' => self.add_token(TokenType.KwIn)
+        | 'let' => self.add_token(TokenType.KwLet)
+        | 'match' => self.add_token(TokenType.KwMatch)
+        | 'mod' => self.add_token(TokenType.KwMod)
+        | 'or' => self.add_token(TokenType.KwOr)
+        | 'package' => self.add_token(TokenType.KwPackage)
+        | 'pub' => self.add_token(TokenType.KwPub)
+        | 'return' => self.add_token(TokenType.KwReturn)
+        | 'self' => self.add_token(TokenType.KwSelfValue)
+        | 'Self' => self.add_token(TokenType.KwSelfType)
+        | 'static' => self.add_token(TokenType.KwStatic)
+        | 'struct' => self.add_token(TokenType.KwStruct)
+        | 'throw' => self.add_token(TokenType.KwThrow)
+        | 'True' => self.add_token(TokenType.KwTrue)
+        | 'use' => self.add_token(TokenType.KwUse)
+        | 'var' => self.add_token(TokenType.KwVar)
+        | 'wait' => self.add_token(TokenType.KwWait)
+        | 'while' => self.add_token(TokenType.KwWhile)
+        | o => self.add_lit_token(TokenType.Identifier, o)
+        ;
+    ;
 
-    fn is_alpha(char: String) bool {
-        (
-            ('a' <= char <= 'z') or
-            ('A' <= char <= 'Z')
-        )
-
-    fn number(var self: &var Self, first: String) {
-        if self.is_end() {
+    fn is_alpha(char: String)
+        if(
+        'a' <= char <= 'z'
+            or
+        'A' <= char <= 'Z'
+        );
+    ;
+    fn number(var self: &var Self, first: String)
+        if (self.is_end())
             self.add_lit_token(TokenType.Int, first)
             return
-        }
+        ;
         let sec = self.src[self.char]
         var literal = first + sec 
-        if first == '0' {
-            match sec {
-                'x' => return self.hexadecimal()
-                'b' => return self.binary()
-                o => ()
-            }
-        } elif not is_digit(sec) {
+        if (first == '0')
+            match sec
+            | 'x' => return self.hexadecimal()
+            | 'b' => return self.binary()
+            | o => ()
+            ;
+        elif (not is_digit(sec))
             return self.add_lit_token(TokenType.Int, first)
-        }
-        while not self.is_end() {
+        ;
+        while (not self.is_end())
             char = self.src[self.char]
-            if not is_digit(char) and not char == '.' {
+            if (not is_digit(char) and not char == '.')
                 break
-            }
-            match char {
-                '.' => return self.float(literal + char)
-                o => literal += char
-            }
+            ;
+            match char
+            | '.' => return self.float(literal + char)
+            | o => literal += char
+            ;
             self.char++
-        }
+        ;
         self.add_lit_token(TokenType.Int, literal)
-    }
+    ;  
 
-    fn float(var self: &var Self, var literal: String) {
-        while not self.is_end() {
+    fn float(var self: &var Self, var literal: String)
+        while (not self.is_end())
             char = self.src[self.char]
-            if not is_digit(char) {break}
+            if (not is_digit(char))
+                break
+            ;
             literal += char
             self.char++
-        }
+        ;
         self.add_lit_token(TokenType.Float, literal)
-    }
+    ;
 
-    fn is_end(self) bool {
+    fn is_end(self)
         self.char >= self.length
-    }
-}
+    ;
+; // end class
     
     
 
