@@ -8,10 +8,10 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 
 ```mythic
-let monday = ['😊', '🤨', '🤪', '😴']
-for emotion in monday{
+let monday = list['😊', '🤨', '🤪', '😴']
+for (emotion in monday)
     println(emotion)
-}
+;
 ```
 <br/>
 
