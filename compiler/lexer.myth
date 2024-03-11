@@ -16,7 +16,7 @@ class Tokenizer
     struct { 
         src: [String],
         file: Path,
-        token: [Token] = list[],
+        token: [Token] = #[],
         line: u32 = 0,
         char: i64 = 0,
         length: i64 = 0,
@@ -179,11 +179,9 @@ class Tokenizer
     ;
 
     fn is_alpha(char: String)
-        if(
         'a' <= char <= 'z'
             or
         'A' <= char <= 'Z'
-        );
     ;
     fn number(var self: &var Self, first: String)
         if (self.is_end())
