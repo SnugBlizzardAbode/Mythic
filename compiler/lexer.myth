@@ -32,7 +32,7 @@ class Tokenizer
     ;
 
     // !LexerErr
-    fn next_lexeme(var self: &var Self, line_aware: bool)
+    fn next_lexeme(&var self, line_aware: bool)
         char = self.advance()
 
         match char 
@@ -52,7 +52,7 @@ class Tokenizer
         | '\n' => 
         | '\r\n' => 
         | '\t' => 
-        | '/' => self.add_token(TokenType.LSlash)
+        | '/' => self.parse_lslash()
         | ':' => self.parse_colon()
         | '+' => self.parse_plus()
         | '-' => self.parse_minus()
@@ -73,18 +73,18 @@ class Tokenizer
         ;
     ;
 
-    fn advance(var self: &var Self)
+    fn advance(&var self)
         char = self.src[self.char]
         self.char++
         char
     ;
 
-    fn add_token(var self: &var Self, type: TokenType)
+    fn add_token(&var self, type: TokenType)
         let token = Token{type, None, self.line}
         self.token.append(token)
     ;
 
-    fn add_lit_token(var self: &var Self, type: TokenType, lit: String)
+    fn add_lit_token(&var self, type: TokenType, lit: String)
         let token = Token{type, lit, self.line}
         self.token.append(token)
     ;
@@ -108,7 +108,7 @@ class Tokenizer
         ;
     ;
 
-    fn string_literal(var self: &var Self, quote: String)
+    fn string_literal(&var self, quote: String)
         var literal = ""
         while (not self.is_end())
             char = self.advance()
@@ -123,6 +123,10 @@ class Tokenizer
         ; // end while
     ; // end fn
 
+    fn parse_lslash(&var self)
+
+    ;
+
     fn is_digit(char: String)
         if (char >= '0' and char <= '9')
             True
@@ -131,7 +135,7 @@ class Tokenizer
         ;
     ;
 
-    fn parse_word(var self: &var Self, var literal: String)
+    fn parse_word(&var self, var literal: String)
         while (not self.is_end())
             char = self.peek()
              if (not is_alpha(char) and not char == '_')
@@ -183,7 +187,8 @@ class Tokenizer
             or
         'A' <= char <= 'Z'
     ;
-    fn number(var self: &var Self, first: String)
+
+    fn number(&var self, first: String)
         if (self.is_end())
             self.add_lit_token(TokenType.Int, first)
             return
@@ -213,7 +218,7 @@ class Tokenizer
         self.add_lit_token(TokenType.Int, literal)
     ;  
 
-    fn float(var self: &var Self, var literal: String)
+    fn float(&var self, var literal: String)
         while (not self.is_end())
             char = self.src[self.char]
             if (not is_digit(char))
