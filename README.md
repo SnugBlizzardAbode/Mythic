@@ -39,6 +39,23 @@ fn main()
     ;
     let fav = Drink.Water
 
+    match fav
+    | Water => print('refreshing')
+    | _ => print('hmm')
+    ;
+
+    for (i in 1..10)
+        print('😄')
+    ; 
+
+    if (condition)
+        // do stuff
+    elif (condition)
+        // other stuff
+    else
+        // or do...
+    ; 
+    
     "Thanks for all the fish."
 ;
 ```
