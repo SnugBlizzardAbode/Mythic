@@ -8,56 +8,31 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 
 ```mythic
-mod player
-    enum Mushroom
-    | Blue
-    | Brown
-    | Red
-    ;
+package library::path{a,b}
+import path/to/file
 
-    enum State
-    | Mario 
-    | SuperMario
-    | MiniMario
-    | FireMario
-    ;
+mod other;
 
-    class Mario
-        struct {
-        state = State.Mario,
-        coin = 0,
-        }
-
-        fn eat_shroom(var self, shroom)
-            use State
-            match #(self.state,shroom)
-            | #(Mario, Brown) => self.state = SuperMario
-            | #(_, Blue) => self.state = MiniMario
-            | #(_, Red) => self.state = FireMario
-            | #(_, Brown) => 
-            ;
-        ;
-    ; // end class
-; // end module
+/*
+    Block comment
+*/
 
 fn main()
-    let user = player::Mario{}
-    user.eat_shroom(Mushroom.Brown)
+// Variables
+    let non_reassignable = 1
+    var mutable = 2
+    const COMP_VALUE: int = 3
+    static non_changable = 4
+    
+    foo() // function call
+    Bar.g() // method
 
-    let b = #(1,"ok") // tuple
-    let c = #[1,2,3]  // list creation
-    c[0] // accessing index 
+    #(1,2) // Tuple
+    #[1,2,3] // List
 
-    let d = check::Bar.Yay // enum instance
-    // :: only for accessing modules
+    struct Point{x: int, y: int}
+    Point{x: 22, y: 39}
 
-    if (condition)
-        // blah
-    elif (condition)
-        // mm
-    else
-        // else uhhh
-    ;
     "Thanks for all the fish."
 ;
 ```
