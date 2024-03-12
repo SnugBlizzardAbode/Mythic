@@ -31,7 +31,13 @@ fn main()
     #[1,2,3] // List
 
     struct Point{x: int, y: int}
-    Point{x: 22, y: 39}
+    let tree = Point{x: 22, y: 39}
+
+    enum Drink
+    | Water
+    | Soda
+    ;
+    let fav = Drink.Water
 
     "Thanks for all the fish."
 ;
