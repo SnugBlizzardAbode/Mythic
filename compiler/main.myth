@@ -22,7 +22,7 @@ enum BmcErr
 fn main() 
     let setting = sys::argv
     let param = setting.get(1).catch(fn e=>BmcErr.List(e))
-    match param
+    match param {
     | "-help" => return option()
     | "-h" => return option()
     | "-version" => return version()
@@ -34,16 +34,19 @@ fn main()
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
-    let tree = parser::tree::parse_main(token).catch(fn e=>BmcErr.Tree(e))
+    let tree = parser::tree::parse_main(token)
+        .catch(fn e=>BmcErr.Tree(e))
 
     // The ast verifies the validity of sentences
-    let ast = parser::ast::parse(tree).catch(fn e=>BmcErr.Ast(e))
+    let ast = parser::ast::parse(tree)
+        .catch(fn e=>BmcErr.Ast(e))
     let ir = ir::translate(ast)
     var arg = setting.del(0).del(0)
-    let conf = configure(arg).catch(fn _=>BmcErr.Arg)
+    let conf = configure(arg)
+        .catch(fn _=>BmcErr.Arg)
 ;
 
-enum Isa
+enum Isa 
 | Riscv
 | X86
 | Armv8

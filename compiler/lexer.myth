@@ -70,6 +70,7 @@ class Tokenizer
                 self.number(o)
             else 
                 self.parse_word(o)
+            ;
         ;
     ;
 
