@@ -29,7 +29,7 @@ struct ArgDef {
 struct FnDef {
     name: String,
     public: bool,
-    arg: [Variable] = [],
+    arg: [Variable] = #[],
     item: [Statement],
 }
 
