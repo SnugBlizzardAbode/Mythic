@@ -1,4 +1,4 @@
-package os, sys
+import os, sys
 import lexer, token, parser, error
 
 /* 
