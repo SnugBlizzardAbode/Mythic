@@ -1,5 +1,5 @@
 import os, sys
-import lexer, token, parser, error
+import "lexer", "token", "parser","error"
 
 /* 
  By default accessing an index of an uknown sized list will return result
