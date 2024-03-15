@@ -10,6 +10,11 @@ enum Node
 | FnDef(FnDef)
 ;
 
+enum ClassType
+| EnumT(EnumDef)
+| StructT(StructDef)
+;
+
 struct VarDef { 
     variable: [Variable],
     value: Expr, 
@@ -44,5 +49,4 @@ enum Expr
 | IfExpr
 | MatchExpr
 | WhileExpr
-|
 ;
