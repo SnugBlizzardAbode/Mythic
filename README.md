@@ -8,8 +8,8 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 
 ```mythic
-package library::path{a,b}
-import path/to/file
+import path::to::library::{a,b}
+import "path/to/file"
 
 mod other;
 
@@ -21,7 +21,9 @@ fn main()
 // Variables
     let non_reassignable = 1
     var mutable = 2
-    const COMP_VALUE: int = 3
+
+    // negative number
+    const COMP_VALUE: int = #-3
     static non_changable = 4
     
     foo() // function call
