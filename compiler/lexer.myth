@@ -67,10 +67,10 @@ class Tokenizer
         | ')' => self.add_token(TokenType.RParen)
         | '#' => self.add_token(TokenType.Hash)
         | o => if (is_digit(o))
-                self.number(o)
-            else 
-                self.parse_word(o)
-            ;
+                   self.number(o)
+               else 
+                   self.parse_word(o)
+               ;
         ;
     ;
 
