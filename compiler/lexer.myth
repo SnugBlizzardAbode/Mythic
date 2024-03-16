@@ -128,9 +128,9 @@ class Tokenizer
     fn parse_lslash(&var self)
         if (not self.is_end())
             match self.src[self.char]
-            "*" => self.block_comment()
-            "/" => self.line_comment()
-            _ => self.add_token(TokenType.LSlash) 
+            | "*" => self.block_comment()
+            | "/" => self.line_comment()
+            | _ => self.add_token(TokenType.LSlash) 
         ;
     ;
 
