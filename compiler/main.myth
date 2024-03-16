@@ -25,7 +25,7 @@ enum BmcErr
 fn main() 
     let setting = sys::argv
     let param = setting.get(1).catch(fn e=>BmcErr.List(e))
-    match param {
+    match param 
     | "-help" => return option()
     | "-h" => return option()
     | "-version" => return version()
