@@ -1,4 +1,5 @@
-struct Token {
+struct Token 
+{
     type: TokenType,
     literal: string?,
     line: u32

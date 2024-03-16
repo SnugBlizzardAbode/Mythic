@@ -18,7 +18,8 @@ fn parse_main(token: [Token], file: Path)
 ;
 
 class Parser
-    struct {
+    struct 
+    {
         src: [Token],
         file: Path,
         len: u64,

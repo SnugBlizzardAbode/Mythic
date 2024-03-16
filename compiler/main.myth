@@ -1,5 +1,8 @@
-import os, sys
-import "lexer", "token", "parser","error"
+import os sys
+       "lexer"
+       "token"
+       "parser"
+       "error"
 
 /* 
  By default accessing an index of an uknown sized list will return result
@@ -65,7 +68,8 @@ enum Optimize
 | Normal
 ;
 
-struct Config {
+struct Config 
+{
     isa: Isa
     os: Platform
     optimize: Optimize

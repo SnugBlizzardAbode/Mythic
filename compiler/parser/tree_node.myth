@@ -15,23 +15,27 @@ enum ClassType
 | StructT(StructDef)
 ;
 
-struct VarDef { 
+struct VarDef 
+{ 
     variable: [Variable],
     value: Expr, 
 }
 
-struct Variable {
+struct Variable 
+{
     name: String,
     mutable: bool,
     type: Type,
 }
 
-struct ArgDef {
+struct ArgDef 
+{
     mutable: bool,
     name: String,
 }
 
-struct FnDef {
+struct FnDef 
+{
     name: String,
     public: bool,
     arg: [Variable] = #[],

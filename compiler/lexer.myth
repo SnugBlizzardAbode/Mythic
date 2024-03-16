@@ -13,7 +13,8 @@ fn scan(file: Path)
 ;
 
 class Tokenizer
-    struct { 
+    struct 
+    { 
         src: [String],
         file: Path,
         token: [Token] = #[],
