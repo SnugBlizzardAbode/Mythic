@@ -96,6 +96,16 @@ class Parser
         Node.FnDef(fn_node)
     ;
 
+    fn class_def() ;
+
+    fn extend_node() ;
+
+    fn struct_def() ;
+
+    fn enum_def() ;
+
+    fn var_def() ;
+
     fn is_end(self: &ro Self)
         self.current >= self.len
     ;
