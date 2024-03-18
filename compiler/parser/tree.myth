@@ -28,7 +28,7 @@ class Parser
 
     // [Node]!TreeErr
     fn create_tree(self) 
-        var nodes:[Node] = list[]
+        var nodes:[Node] = #[]
          while (not self.is_end)
             let token = self.advance()
             var item: Node? = None
@@ -45,7 +45,7 @@ class Parser
             | KwStruct => item = self.struct_def()
             | KwEnum => item = self.enum_def()
             | KwLet => item = self.var_def()
-            | KwVar => item = self.var_def()
+            | KwVar => item = self.var_def(True)
             | KwStatic => item = self.static_def()
             | KwConst =>  item = self.const_def()
             | e => throw TreeErr.BadToken(e)
@@ -104,12 +104,14 @@ class Parser
 
     fn enum_def() ;
 
-    fn var_def() ;
+    fn var_def(&var self, mutable = False)
+        
+    ;
 
     fn static_def() ;
 
     fn const_def() ;
-    
+
 
     fn is_end(self: &ro Self)
         self.current >= self.len
