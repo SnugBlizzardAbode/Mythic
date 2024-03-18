@@ -24,7 +24,9 @@ enum BmcErr
 // !BmcErr 
 fn main() 
     let setting = sys::argv
-    let param = setting.get(1).catch(fn e=>BmcErr.List(e))
+    let param = setting.get(1)
+        .catch(fn e=>BmcErr.List(e))
+        
     match param 
     | "-help" => return option()
     | "-h" => return option()
@@ -33,7 +35,8 @@ fn main()
     | _ =>
     ;
     let file = os::Path.from(param)
-    let token = lexer::scan(file).catch(fn e=>BmcErr.Lexer(e))
+    let token = lexer::scan(file)
+        .catch(fn e=>BmcErr.Lexer(e))
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
@@ -82,5 +85,5 @@ struct Config
 */
 // Config!
 fn configure(arg: [string], conf: ?Config = None)
-
+     
 ;
