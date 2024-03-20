@@ -40,8 +40,8 @@ fn main()
 
     enum Drink
     {
-      Water
-      Soda
+      Water,
+      Soda,
     }
     let fav = Drink.Water;
 
