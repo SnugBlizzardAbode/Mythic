@@ -1,23 +1,26 @@
-use package::{parser::tree_node, token}
+use package::{parser::tree_node, token};
 
 enum TreeErr
-| EmptyProgram
-| Lexer(package::lexer::LexerErr)
-| BadToken(package::token::TokenType)
-| Unexpect
-| Err // placeholder
-;
+{
+    EmptyProgram,
+    Lexer(package::lexer::LexerErr),
+    BadToken(package::token::TokenType),
+    Unexpect,
+    Err, // placeholder
+}
 
 // [Node]!TreeErr
 fn parse_main(token: [Token], file: Path)
-    token.get(0).catch(fn _=>TreeErr.EmptyProgram)
+{
+    token.get(0).catch(fn _=>TreeErr.EmptyProgram);
     let root = Parser{token, file, len(token)}
         .create_tree()
-        .catch(fn _=>TreeErr.Err)
-    package::parser::imports::parse_import(root)?
-;
+        .catch(fn _=>TreeErr.Err);
+    package::parser::imports::parse_import(root)?;
+}
 
 class Parser
+{
     struct 
     {
         src: [Token],
@@ -27,129 +30,152 @@ class Parser
     }
 
     // [Node]!TreeErr
-    fn create_tree(self) 
-        var nodes:[Node] = #[]
+    fn create_tree(self)
+    {
+        var nodes:[Node] = [];
          while (not self.is_end)
-            let token = self.advance()
-            var item: Node? = None
+         {
+            let token = self.advance();
+            var item: Node? = None;
 
-            use token::TokenType
+            use token::TokenType;
             match token.type
-            | KwPackage => item = self.parse_package()
-            | KwImport => item = self.parse_import()
-            | KwPub => item = self.parse_pub()
-            | KwMod => item = self.mod_def()
-            | KwFn => item = self.fn_def()
-            | KwClass => item = self.class_def()
-            | KwExtend => item = self.extend_node()
-            | KwStruct => item = self.struct_def()
-            | KwEnum => item = self.enum_def()
-            | KwLet => item = self.var_def()
-            | KwVar => item = self.var_def(True)
-            | KwStatic => item = self.static_def()
-            | KwConst =>  item = self.const_def()
-            | e => throw TreeErr.BadToken(e)
-            ;
-            nodes.append(item)
-         ;
-         nodes
-    ;
+            {
+              KwPackage => item = self.parse_package();
+              KwImport => item = self.parse_import();
+              KwPub => item = self.parse_pub();
+              KwMod => item = self.mod_def();
+              KwFn => item = self.fn_def();
+              KwClass => item = self.class_def();
+              KwExtend => item = self.extend_node();
+              KwStruct => item = self.struct_def();
+              KwEnum => item = self.enum_def();
+              KwLet => item = self.var_def();
+              KwVar => item = self.var_def(True);
+              KwStatic => item = self.static_def();
+              KwConst =>  item = self.const_def();
+              e => throw TreeErr.BadToken(e);
+            }
+            nodes.append(item);
+         }
+         nodes;
+    }
 
     // Node!TreeErr
     fn parse_package(var self: &var Self)
+    {
         if (self.is_end())
-            throw TreeErr.Unexpect
-        ;
-    ;
+        {
+            throw TreeErr.Unexpect;
+        }
+    }
 
     // Node!TreeErr 
     fn parse_import(var self: &var Self)
-    ;
+    {}
 
     // Node!TreeErr
     fn parse_pub(var self: &var Self)
+    {
         if (self.is_end())
-            throw TreeErr.Err
-        ;
-        let t = self.advance()
+        {
+            throw TreeErr.Err;
+        }
+        let t = self.advance();
         match t
-        | TokenType.KwFn => self.fn_def(True)
-        | TokenType.KwMod => self.mod_def(True)
-        | TokenType.KwStruct
-        | e => throw TreeErr.BadToken(e)
-        ;
-    ;
+        {
+          TokenType.KwFn => self.fn_def(True);
+          TokenType.KwMod => self.mod_def(True);
+          TokenType.KwStruct;
+          e => throw TreeErr.BadToken(e);
+        }
+    }
 
     fn mod_def(var self: &var Self, public = False)
-    ;
+    {}
 
     fn fn_def(var self: &var Self, public = False)
-        let name = self.get_next(TokenType.Identifier)?
-        self.is_next(TokenType.LParen)?
-        let arg = self.parse_arg()?
-        self.is_next(TokenType.RParen)?
+    {
+        let name = self.get_next(TokenType.Identifier)?;
+        self.is_next(TokenType.LParen)?;
+        let arg = self.parse_arg()?;
+        self.is_next(TokenType.RParen)?;
         var return_type = TypeDef.None
-        self.is_next(TokenType.LCurly)?
-        let body = self.parse_statement()?
-        self.is_next(TokenType.RCurly)?
-        let fn_node = FnDef{name, public, arg, body}
-        Node.FnDef(fn_node)
-    ;
+        self.is_next(TokenType.LCurly)?;
+        let body = self.parse_statement()?;
+        self.is_next(TokenType.RCurly)?;
+        let fn_node = FnDef{name, public, arg, body};
+        Node.FnDef(fn_node);
+    }
 
-    fn class_def() ;
+    fn class_def() 
+    {}
 
-    fn extend_node() ;
+    fn extend_node() {}
 
-    fn struct_def() ;
+    fn struct_def() 
+    {}
 
-    fn enum_def() ;
+    fn enum_def()
+    {}
 
-    fn var_def(&var self, mutable = False)
-        
-    ;
+    fn var_def(&var self, mutable = False)   
+    {}
 
-    fn static_def() ;
+    fn static_def() 
+    {}
 
-    fn const_def() ;
+    fn const_def()
+    {}
 
 
     fn is_end(self: &ro Self)
-        self.current >= self.len
-    ;
+    {
+        self.current >= self.len;
+    }
 
     fn get_next(var self: &var Self, expect: TokenType)
+    {
         while (not self.is_end())
-            let t = self.src[self.char]
+        {
+            let t = self.src[self.char];
             if (assert(expect, t.type))
-                self.current++
-                return t
-            ;
+            {
+                self.current++;
+                return t;
+            }
             match t.type
-            | TokenType.Semicolon =>
-            | e => throw TreeErr.Unexpect(expect, e)
-            ;
-            self.current++
-        ; // end while
-    ;
+            {
+              TokenType.Semicolon =>;
+              e => throw TreeErr.Unexpect(expect, e);
+            }
+            self.current++;
+        } // end while
+    }
 
     fn is_next(var self: &var Self, expect: TokenType)
+    {
         while (not self.is_end())
-            let t = self.src[self.char]
+        {
+            let t = self.src[self.char];
             if (assert(expect, t.type))
-                self.current++
-                return
-            ;
+            {
+                self.current++;
+                return;
+            }
             match t.type
-            | TokenType.Semicolon =>
-            | e => throw TreeErr.Unexpect(expect, e)
-            ;
-            self.current++
-        ;
-    ;
+            {
+              TokenType.Semicolon =>;
+              e => throw TreeErr.Unexpect(expect, e);
+            }
+            self.current++;
+        }
+    }
 
     fn advance(var self: &var Self)
-        let token = self.src[self.current]
-        self.current++
-        token
-    ;
-; // end class
+    {
+        let token = self.src[self.current];
+        self.current++;
+        token;
+    }
+} // end class
