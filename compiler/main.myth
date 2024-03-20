@@ -2,7 +2,7 @@ import os sys
        "lexer"
        "token"
        "parser"
-       "error"
+       "error";
 
 /* 
  By default accessing an index of an uknown sized list will return result
@@ -11,72 +11,78 @@ import os sys
 */
 $unchecked_list_access
 
-enum BmcErr 
-| List(ListErr)
-| File(os::FileErr)
-| Lexer(lexer::LexerErr)
-| Tree(parser::tree::TreeErr)
-| Ast(parser::ast::AstErr)
-| Other
-| Arg
-;
+enum BmcErr
+{   
+    List(ListErr),
+    File(os::FileErr),
+    Lexer(lexer::LexerErr),
+    Tree(parser::tree::TreeErr),
+    Ast(parser::ast::AstErr),
+    Other,
+    Arg,
+}
 
 // !BmcErr 
 fn main() 
-    let setting = sys::argv
+{
+    let setting = sys::argv;
     let param = setting.get(1)
-        .catch(fn e=>BmcErr.List(e))
+        .catch(|e|BmcErr.List(e));
         
     match param 
-    | "-help" => return option()
-    | "-h" => return option()
-    | "-version" => return version()
-    | "-v" => return version()
-    | _ =>
-    ;
-    let file = os::Path.from(param)
+    {
+     "-help" => return option();
+     "-h" => return option();
+     "-version" => return version();
+     "-v" => return version();
+     _ =>
+    }
+    let file = os::Path.from(param);
     let token = lexer::scan(file)
-        .catch(fn e=>BmcErr.Lexer(e))
+        .catch(|e|BmcErr.Lexer(e));
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
     let tree = parser::tree::parse_main(token)
-        .catch(fn e=>BmcErr.Tree(e))
+        .catch(|e|BmcErr.Tree(e));
 
     // The ast verifies the validity of sentences
     let ast = parser::ast::parse(tree)
-        .catch(fn e=>BmcErr.Ast(e))
-    let ir = ir::translate(ast)
-    var arg = setting.del(0).del(0)
-    let conf = configure(arg)
-        .catch(fn _=>BmcErr.Arg)
-;
+        .catch(|e|BmcErr.Ast(e));
+    let ir = ir::translate(ast);
+    var arg = setting.del(0).del(0);
+    let conf = configure(arg);
+        .catch(|_|BmcErr.Arg);
+}
 
 enum Isa 
-| Riscv
-| X86
-| Armv8
-;
+{
+    Riscv,
+    X86,
+    Armv8,
+}
 
 enum Platform
-| Mac
-| Linux
-| Windows
-| Bard
-;
+{
+    Mac,
+    Linux,
+    Windows,
+    Bard,
+}
 
-enum Optimize
-| Memory
-| Speed
-| Normal
-;
+enum Optimize 
+{
+    Memory,
+    Speed,
+    Normal,
+}
 
 struct Config 
 {
-    isa: Isa
-    os: Platform
-    optimize: Optimize
-    output_loc: ?Path
+    isa: Isa,
+    os: Platform,
+    optimize: Optimize,
+    output_loc: ?Path,
 }
 
 
@@ -85,5 +91,6 @@ struct Config
 */
 // Config!
 fn configure(arg: [string], conf: ?Config = None)
-     
-;
+{
+
+}
