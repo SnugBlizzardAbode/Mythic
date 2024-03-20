@@ -51,7 +51,7 @@ fn main()
         .catch(|e|BmcErr.Ast(e));
     let ir = ir::translate(ast);
     var arg = setting.del(0).del(0);
-    let conf = configure(arg);
+    let conf = configure(arg)
         .catch(|_|BmcErr.Arg);
 }
 
