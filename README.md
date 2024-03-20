@@ -11,55 +11,66 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 import path::to::library::{a,b}
 import "path/to/file"
 
-mod other;
+mod other
+{
+
+}
 
 /*
     Block comment
 */
 
 fn main()
+{
 // Variables
-    let non_reassignable = 1
-    var mutable = 2
+    let non_reassignable = 1;
+    var mutable = 2;
 
-    // negative number
-    const COMP_VALUE: int = #-3
-    static non_changable = 4
+    const COMP_VALUE: int = -3;
+    static non_changable = 4;
     
-    foo() // function call
-    Bar.g() // method
+    foo(); // function call
+    Bar.g(); // method
 
-    #(1,2) // Tuple
-    #[1,2,3] // List
+    (1,2); // Tuple
+    [1,2,3]; // List
 
     struct Point{x: int, y: int}
-    let tree = Point{x: 22, y: 39}
+    let tree = Point{x: 22, y: 39};
 
     enum Drink
-    | Water
-    | Soda
-    ;
-    let fav = Drink.Water
+    {
+      Water
+      Soda
+    }
+    let fav = Drink.Water;
 
     match fav
-    | Water => print('refreshing')
-    | _ => print('hmm')
-    ;
+    {
+      Water => print('refreshing');
+      _ => print('hmm');
+    }
 
     for (i in 1..10)
-        print('😄')
-    ; 
+    {
+        print('😄');
+    } 
 
     if (condition)
+    {
         // do stuff
+    }
     elif (condition)
+    {
         // other stuff
+    }
     else
+    {
         // or do...
-    ; 
+    } 
     
-    "Thanks for all the fish."
-;
+    "Thanks for all the fish.";
+}
 ```
 <br/>
 
