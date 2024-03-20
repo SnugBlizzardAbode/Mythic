@@ -9,7 +9,7 @@ import os sys
  This changes it to access it with no safeguards.
  Program panics if index doesn't exist
 */
-$unchecked_list_access
+$unchecked_list_access;
 
 enum BmcErr
 {   
