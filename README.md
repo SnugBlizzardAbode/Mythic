@@ -14,6 +14,8 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 #### [How to install](https://mythic-lang.org/install)
 
 Instructions for downloading and installing the Mythic compiler.
+
+<br/>
 <br/>
 <br/>
 
