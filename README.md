@@ -28,6 +28,7 @@ Documentation on how to program in mythic.
 Chat with Mythic programmers on the community Discord.
 
 <br/>
+<br/>
 
 ## Caution
 
