@@ -7,15 +7,41 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 <br/>
 
+<br/>
+
+## Installing
+
+#### [How to install](https://mythic-lang.org/install)
+
+Instructions for downloading and installing the Mythic compiler.
+<br/>
+<br/>
+
+## Learn Mythic
+
+#### [Documentation](https://mythic-lang.org/learn)
+
+Documentation on how to program in mythic.
+
+#### [Community](https://discord.gg/qURCVCA7KP)
+
+Chat with Mythic programmers on the community Discord.
+
+<br/>
+
+## Caution
+
+* The Mythic language is still under development.
+
+<br/>
+<br/>
+
+## Syntax Example
 ```mythic
 import path::to::library::{a,b};
 import "path/to/file_1", "/Users/foo/file_2";
 
-mod other
-{
-
-}
-
+mod other {}
 /*
     Block comment
 */
@@ -48,7 +74,7 @@ fn main()
     match fav
     {
       Water => print('refreshing');
-      _ => print('hmm');
+      _ => {}
     }
 
     for (i in 1..10)
@@ -56,44 +82,8 @@ fn main()
         print('😄');
     } 
 
-    if (condition)
-    {
-        // do stuff
-    }
-    elif (condition)
-    {
-        // other stuff
-    }
-    else
-    {
-        // or do...
-    } 
-    
+    if (condition) {}
+    elif (condition) {}
     "Thanks for all the fish.";
 }
 ```
-<br/>
-
-## Installing
-
-#### [How to install](https://mythic-lang.org/install)
-
-Instructions for downloading and installing the Mythic compiler.
-<br/>
-<br/>
-
-## Learn Mythic
-
-#### [Documentation](https://mythic-lang.org/learn)
-
-Documentation on how to program in mythic.
-
-#### [Community](https://discord.gg/qURCVCA7KP)
-
-Chat with Mythic programmers on the community Discord.
-
-<br/>
-
-## Caution
-
-* The Mythic language is still under development.
