@@ -8,8 +8,8 @@ Website: [https://mythic-lang.org](https://mythic-lang.org)
 <br/>
 
 ```mythic
-import path::to::library::{a,b}
-import "path/to/file"
+import path::to::library::{a,b};
+import "path/to/file_1", "/Users/foo/file_2";
 
 mod other
 {
