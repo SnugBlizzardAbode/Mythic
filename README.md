@@ -41,52 +41,53 @@ Chat with Mythic programmers on the community Discord.
 
 ## Syntax Example
 ```mythic
-import path::to::library::{a,b};
-import "path/to/file_1", "/Users/foo/file_2";
+import 
+    path::to::library::{a,b}
+    "path/to/file_1"
+    "/Users/foo/file_2"
+;
 
-mod other {}
+mod other ;
 /*
     Block comment
 */
 
 fn main()
-{
 // Variables
-    let non_reassignable = 1;
-    var mutable = 2;
+    let non_reassignable = 1
+    var mutable = 2
 
-    const COMP_VALUE: int = -3;
-    static non_changable = 4;
+    // Negative number with ~
+    const COMP_VALUE: int = ~3
+    static non_changable = 4
     
     foo(); // function call
     Bar.g(); // method
 
-    (1,2); // Tuple
-    [1,2,3]; // List
+    #(1,2) // Tuple creation
+    #[1,2,3] // List creation
 
     struct Point{x: int, y: int}
-    let tree = Point{x: 22, y: 39};
+    let tree = Point{x: 22, y: 39}
 
     enum Drink
-    {
-      Water,
-      Soda,
-    }
-    let fav = Drink.Water;
+    | Water
+    | Soda
+    ;
+    let fav = Drink.Water
 
     match fav
-    {
-      Water => print('refreshing');
-      _ => {}
-    }
+    | Water => print('refreshing')
+    | _ => 
+    ;
 
     for (i in 1..10)
-    {
-        print('😄');
-    } 
+        print('😄')
+    ;
 
-    if (condition) {}
-    elif (condition) {}
-    "Thanks for all the fish.";
-}
+    if (condition) 
+    elif (condition) 
+    ;
+    "Thanks for all the fish."
+;
 ```
