@@ -6,30 +6,29 @@ struct Token
 }
 
 enum TokenType
-{
-// Operators
-    LParen, RParen, LBrace, RBrace, LCurly,
-    RCurly, LSlash, RSlash, Comma, Underscore,
-    Semicolon, Dot, Currency, Ref, At, Question,
+| LParen | RParen | LBrace | RBrace | LCurly
+| RCurly | LSlash | RSlash | Comma | Underscore
+| Semicolon | Dot | Currency | Ref | At | Question
 
-    Eq, EqEq, EqRVec, Plus, PlusPlus,
-    PlusEq, Minus, MinusMinus, MinusEq,
-    Less, LessEq, Great, GreatEq,
-    Star, StarStar, Exclam, NotEq, Colon, PathSep,
+| Eq | EqEq | EqRVec | Plus | PlusPlus
+| PlusEq | Minus | MinusMinus | MinusEq
+| Less | LessEq | Great | GreatEq
+| Star | StarStar | Exclam | NotEq | Colon | PathSep
 
 // Literals
-    Identifier, String, Int, Float,
-    Byte, Hexadecimal,
+| Identifier | String | Int | Float
+| Byte | Hexadecimal
 
 // Keywords
-    KwAnd, KwAs, KwWait, KwBreak,
-    KwClass, KwConst, KwContinue, KwElif,
-    KwElse, KwEnum, KwExtend, KwFalse,
-    KwFn, KwFor, KwIf, KwIn,
-    KwImport, KwLet, KwMatch, KwMod,
-    KwOr, KwPackage, KwPub, KwReturn,
-    KwSelfValue, KwSelfType, KwStatic,
-    KwStruct, KwThrow, KwTrue, KwUse,
-    KwVar, KwWhile,
-}
+| KwAnd | KwAs | KwWait | KwBreak
+| KwClass | KwConst | KwContinue | KwElif
+| KwElse | KwEnum | KwExtend | KwFalse
+| KwFn | KwFor | KwIf | KwIn
+| KwImport | KwLet | KwMatch | KwMod
+| KwOr | KwPackage | KwPub | KwReturn
+| KwSelfValue | KwSelfType | KwStatic
+| KwStruct | KwThrow | KwTrue | KwUse
+| KwVar | KwWhile
+;
+
 

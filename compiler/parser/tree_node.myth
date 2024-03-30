@@ -1,21 +1,19 @@
 enum Node
-{
-    PackageDef { item: [ModPath] },
-    ImportDef { item: [Path] },
-    ModDef { item: [Node] },
-    StructDef { name: String, field: [Field] },
-    EnumDef { name: String, variant: [Variant] },
-    ClassDef { type: ClassType, name: String, item: [FnDef] },
-    ExtendDef { name: String, item: [FnDef] },
-    VarDef(VarDef),
-    FnDef(FnDef),
-}
+| PackageDef { item: [ModPath] }
+| ImportDef { item: [Path] } 
+| ModDef { item: [Node] }
+| StructDef { name: String, field: [Field] }
+| EnumDef { name: String, variant: [Variant] }
+| ClassDef { type: ClassType, name: String, item: [FnDef] }
+| ExtendDef { name: String, item: [FnDef] }
+| VarDef(VarDef)
+| FnDef(FnDef)
+;
 
 enum ClassType
-{
-    EnumT(EnumDef),
-    StructT(StructDef),
-}
+| EnumT(EnumDef)
+| StructT(StructDef)
+;
 
 struct VarDef 
 { 
@@ -40,21 +38,19 @@ struct FnDef
 {
     name: String,
     public: bool,
-    arg: [Variable] = [],
+    arg: [Variable] = #[],
     item: [Statement],
 }
 
 enum Statement
-{
-    Declar(VarDef),
-    Assign,
-    Expr(Expr),
-}
+| Declar(VarDef)
+| Assign
+| Expr(Expr)
+;
 
 enum Expr
-{
-    ForExpr,
-    IfExpr,
-    MatchExpr,
-    WhileExpr,
-}
+| ForExpr
+| IfExpr
+| MatchExpr
+| WhileExpr
+;
