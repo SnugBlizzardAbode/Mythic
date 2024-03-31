@@ -47,13 +47,14 @@ import
     "/Users/foo/file_2"
 ;
 
-mod other ;
-/*
-    Block comment
-*/
+mod other 
+    /*
+        Block comment
+    */
+;
 
 fn main()
-// Variables
+    // Variables
     let non_reassignable = 1
     var mutable = 2
 
@@ -61,8 +62,8 @@ fn main()
     const COMP_VALUE: int = ~3
     static non_changable = 4
     
-    foo(); // function call
-    Bar.g(); // method
+    foo() // function call
+    Bar.g() // method
 
     #(1,2) // Tuple creation
     #[1,2,3] // List creation
