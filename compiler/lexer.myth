@@ -3,7 +3,7 @@ use package::token
 enum LexerErr
 | File(os::FileErr)
 | List(ListErr)
-| BadChar(String)
+| Char(String)
 ;
 
 // [Token]!LexerErr 
