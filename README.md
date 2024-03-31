@@ -40,4 +40,4 @@ Chat with Mythic programmers on the community Discord.
 <br/>
 
 ## Syntax Example
-<img src="misc/example.svg" alt="syntax example image">
+<img src="misc/example.png" alt="syntax example image">
