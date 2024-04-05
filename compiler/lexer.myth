@@ -235,7 +235,7 @@ class Tokenizer
     fn is_end(self)
         self.char >= self.length
     ;
-; // end class
+;
     
     
 
