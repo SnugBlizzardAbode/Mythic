@@ -28,7 +28,7 @@ class Parser
 
     // [Node]!TreeErr
     fn create_tree(self)
-        var nodes:[Node] = []
+        var nodes:[Node] = #[]
         while (not self.is_end)
             let token = self.advance()
             var item: Node? = None
