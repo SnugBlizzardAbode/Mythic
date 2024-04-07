@@ -52,7 +52,7 @@ class Parser
             ;
             nodes.append(item)
         ;
-        nodes
+        Ok(nodes)
     ;
 
     // Node!TreeErr
