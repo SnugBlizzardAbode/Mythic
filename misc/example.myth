@@ -39,8 +39,12 @@ fn main()
     | _ => 
     ;
 
-    for (i in 1..10)
-        print('😄')
+    let welcome = #['h', 'e', 'l', 'l', 'o']
+    for (x in 1..6)
+        match welcome[x - 1]
+        | Ok(o) => print(o)
+        | Err(e) => 
+        ;
     ;
 
     if (condition) 
