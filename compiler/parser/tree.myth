@@ -71,11 +71,14 @@ class Parser
         if (self.is_end())
             throw TreeErr.Err
         ;
+        var item: Node? = None
         let t = self.advance()
         match t
-        | TokenType.KwFn => self.fn_def(True)
-        | TokenType.KwMod => self.mod_def(True)
-        | TokenType.KwStruct
+        | TokenType.KwFn => item = self.fn_def(True)
+        | TokenType.KwMod => item = self.mod_def(True)
+        | TokenType.KwStruct => item = self.struct_def(True)
+        | TokenType.KwEnum => item = self.enum_def(True)
+        | TokenType.KwClass => item = self.class_def(True)
         | e => throw TreeErr.BadToken(e)
         ;
     ;
@@ -96,16 +99,16 @@ class Parser
         Node.FnDef(fn_node)
     ;
 
-    fn class_def() 
+    fn class_def(&var self, public = False) 
     ;
 
     fn extend_node()
     ;
 
-    fn struct_def() 
+    fn struct_def(&var self, public = False) 
     ;
 
-    fn enum_def()
+    fn enum_def(&var self, public = False)
     ;
 
     fn var_def(&var self, mutable = False)   
@@ -142,7 +145,7 @@ class Parser
             let t = self.src[self.char]
             if (assert(expect, t.type))
                 self.current++
-                return
+                return Ok()
             ;
             match t.type
             | TokenType.Semicolon =>
@@ -157,4 +160,4 @@ class Parser
         self.current++
         token
     ;
-; // end class
+; 
