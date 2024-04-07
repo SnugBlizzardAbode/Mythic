@@ -29,7 +29,7 @@ class Tokenizer
         while (not self.is_end())
             self.next_lexeme(True)?
         ;
-        self.token
+        Ok(self.token)
     ;
 
     // !LexerErr
@@ -93,8 +93,8 @@ class Tokenizer
     ;
 
     fn expect(self, expec: String)
-        if (not is_end())
-            if (self.src{self.char} == expec)
+        if (not self.is_end())
+            if (self.src[self.char] == expec)
                 True
             else
                 False
@@ -201,7 +201,7 @@ class Tokenizer
             match sec
             | 'x' => return self.hexadecimal()
             | 'b' => return self.binary()
-            | o => ()
+            | o => 
             ;
         elif (not is_digit(sec))
             return self.add_lit_token(TokenType.Int, first)
