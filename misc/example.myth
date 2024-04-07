@@ -50,5 +50,5 @@ fn main()
     if (condition) 
     elif (condition) 
     ;
-    "Thanks for all the fish."
+    print("Thanks for all the fish.")
 ;
