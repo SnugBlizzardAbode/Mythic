@@ -81,6 +81,7 @@ class Parser
         | TokenType.KwClass => item = self.class_def(True)
         | e => throw TreeErr.BadToken(e)
         ;
+        item
     ;
 
     fn mod_def(var self: &var Self, public = False)
