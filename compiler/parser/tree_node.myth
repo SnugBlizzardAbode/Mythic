@@ -1,7 +1,6 @@
 enum Node
-| PackageDef { item: [ModPath] }
-| ImportDef { item: [Path] } 
-| ModDef { item: [Node] }
+| ImportDef([ImportItem]) 
+| ModDef { name: String, item: [Node] }
 | StructDef { name: String, field: [Field] }
 | EnumDef { name: String, variant: [Variant] }
 | ClassDef { type: ClassType, name: String, item: [FnDef] }
@@ -13,6 +12,16 @@ enum Node
 enum ClassType
 | EnumT(EnumDef)
 | StructT(StructDef)
+;
+
+struct ImportItem 
+{
+    type: ImportType,
+}
+
+enum ImportType
+| File(Path)
+| Library(ModPath)
 ;
 
 struct VarDef 

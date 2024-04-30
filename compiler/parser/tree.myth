@@ -64,6 +64,10 @@ class Parser
 
     // Node!TreeErr 
     fn parse_import(var self: &var Self)
+        var imports: []
+        while not self.is_end()
+
+        ;
     ;
 
     // Node!TreeErr
