@@ -64,7 +64,7 @@ class Parser
 
     // Node!TreeErr 
     fn parse_import(var self: &var Self)
-        var imports: []
+        var imports = Node.ImportDef(#[])
         while not self.is_end()
 
         ;
