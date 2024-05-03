@@ -31,42 +31,49 @@ class Parser
         var nodes:[Node] = #[]
         while (not self.is_end)
             let token = self.advance()
-            var item: Node? = None
+            var res = None
 
             use token::TokenType
             match token.type
-            | KwPackage => item = self.parse_package()
-            | KwImport => item = self.parse_import()
-            | KwPub => item = self.parse_pub()
-            | KwMod => item = self.mod_def()
-            | KwFn => item = self.fn_def()
-            | KwClass => item = self.class_def()
-            | KwExtend => item = self.extend_node()
-            | KwStruct => item = self.struct_def()
-            | KwEnum => item = self.enum_def()
-            | KwLet => item = self.var_def()
-            | KwVar => item = self.var_def(True)
-            | KwStatic => item = self.static_def()
-            | KwConst =>  item = self.const_def()
+            | KwImport => res = self.parse_import()
+            | KwPub => res = self.parse_pub()
+            | KwMod => res = self.mod_def()
+            | KwFn => res = self.fn_def()
+            | KwClass => res = self.class_def()
+            | KwExtend => res = self.extend_node()
+            | KwStruct => res = self.struct_def()
+            | KwEnum => res = self.enum_def()
+            | KwLet => res = self.var_def()
+            | KwVar => res = self.var_def(True)
+            | KwStatic => res = self.static_def()
+            | KwConst =>  res = self.const_def()
             | e => throw TreeErr.BadToken(e)
             ;
-            nodes.append(item)
+            match res 
+            | Ok(o) => nodes.append(o)
+            | Err(e) => throw e
+            ;
         ;
         Ok(nodes)
-    ;
-
-    // Node!TreeErr
-    fn parse_package(var self: &var Self)
-        if (self.is_end())
-            throw TreeErr.Unexpect
-        ;
     ;
 
     // Node!TreeErr 
     fn parse_import(var self: &var Self)
         var imports = Node.ImportDef(#[])
         while not self.is_end()
+            let token = self.advance()
+            var res = 
 
+            use token::TokenType
+            match res
+            | Identifier => res = self.library_import()
+            | StringLit => res = self.file_import()
+            | o => throw TreeErr.BadToken(o)
+            ;
+            match res
+            | Ok(o) => Ok(o)
+            | Err(e) => throw e
+            ;
         ;
     ;
 

@@ -17,6 +17,7 @@ enum ClassType
 struct ImportItem 
 {
     type: ImportType,
+    as_mod: ModPath,
 }
 
 enum ImportType
