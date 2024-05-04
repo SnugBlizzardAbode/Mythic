@@ -1,5 +1,10 @@
 use package::{parser::tree_node, token}
 
+/*
+    &var self is alias for var self: &var Self
+*/
+
+
 enum TreeErr
 | EmptyProgram
 | Lexer(package::lexer::LexerErr)
@@ -31,7 +36,7 @@ class Parser
         var nodes:[Node] = #[]
         while (not self.is_end)
             let token = self.advance()
-            var res: <Node, TreeErr>? = None
+            var res = // Todo: pick type
 
             use token::TokenType
             match token.type
@@ -62,7 +67,7 @@ class Parser
         var imports = Node.ImportDef(#[])
         while not self.is_end()
             let token = self.advance()
-            var res = 
+            var res = // Todo: pick type
 
             use token::TokenType
             match res
@@ -82,21 +87,20 @@ class Parser
         if (self.is_end())
             throw TreeErr.Err
         ;
-        var item: <Node, TreeErr>? = None
+        var res = // Todo: pick type
         let t = self.advance()
         match t
-        | TokenType.KwFn => item = self.fn_def(True)
-        | TokenType.KwMod => item = self.mod_def(True)
-        | TokenType.KwStruct => item = self.struct_def(True)
-        | TokenType.KwEnum => item = self.enum_def(True)
-        | TokenType.KwClass => item = self.class_def(True)
+        | TokenType.KwFn => res = self.fn_def(True)
+        | TokenType.KwMod => res = self.mod_def(True)
+        | TokenType.KwStruct => res = self.struct_def(True)
+        | TokenType.KwEnum => res = self.enum_def(True)
+        | TokenType.KwClass => res = self.class_def(True)
         | e => throw TreeErr.BadToken(e)
         ;
-        item
+        res
     ;
 
     fn mod_def(var self: &var Self, public = False)
-
         if self.is_end()
             throw TreeErr.Unfinished
         ;
@@ -131,7 +135,7 @@ class Parser
         throw TreeErr.Unfinished
     ;
 
-    fn fn_def(var self: &var Self, public = False)
+    fn fn_def(&var self, public = False)
         let name = self.get_next(TokenType.Identifier)?
         self.is_next(TokenType.LParen)?
         let arg = self.parse_arg()?
@@ -159,10 +163,10 @@ class Parser
     fn var_def(&var self, mutable = False)   
     ;
 
-    fn static_def() 
+    fn static_def(&var self) 
     ;
 
-    fn const_def()
+    fn const_def(&var self)
     ;
 
 
