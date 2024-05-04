@@ -31,7 +31,7 @@ class Parser
         var nodes:[Node] = #[]
         while (not self.is_end)
             let token = self.advance()
-            var res = None
+            var res: <Node, TreeErr>? = None
 
             use token::TokenType
             match token.type
@@ -82,7 +82,7 @@ class Parser
         if (self.is_end())
             throw TreeErr.Err
         ;
-        var item: Node? = None
+        var item: <Node, TreeErr>? = None
         let t = self.advance()
         match t
         | TokenType.KwFn => item = self.fn_def(True)
@@ -96,6 +96,39 @@ class Parser
     ;
 
     fn mod_def(var self: &var Self, public = False)
+
+        if self.is_end()
+            throw TreeErr.Unfinished
+        ;
+        let name = self.advance()
+
+        use token::TokenType
+        match name 
+        | Identifier => 
+        | o => throw TreeErr.BadToken(o)
+        ; 
+
+        var mod_item = Node.ModDef{name: name, item: #[]}
+        while not self.is_end()
+            let item = self.advance()
+            var res: <Node, TreeErr>
+
+            match item
+            | KwClass => res = self.parse_class()
+            | KwMod => res = self.parse_mod()
+            | KwStruct => res = self.struct_def()
+            | KwEnum => res = self.enum_def()
+            | KwFn => res => self.fn_def()
+            | KwPub => res => self.parse_pub()
+            | Semicolon => return Ok(mod_item)
+            | o => throw TreeErr.BadToken(o)
+            ;
+            match res
+            | Ok(o) => mod_item.item.append(o)
+            | Err(e) => throw e 
+            ;
+        ;
+        throw TreeErr.Unfinished
     ;
 
     fn fn_def(var self: &var Self, public = False)
