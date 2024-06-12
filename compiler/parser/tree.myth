@@ -10,7 +10,7 @@ enum TreeErr
 | Lexer(package::lexer::LexerErr)
 | BadToken(package::token::TokenType)
 | Unexpect
-| Err // placeholder
+| Unassign // placeholder
 ;
 
 // [Node]!TreeErr
@@ -67,18 +67,15 @@ class Parser
         var imports = Node.ImportDef(#[])
         while not self.is_end()
             let token = self.advance()
-            var res = // Todo: pick type
+            var res = Err(TreeErr.Unassign)
 
             use token::TokenType
-            match res
+            match token
             | Identifier => res = self.library_import()
             | StringLit => res = self.file_import()
             | o => throw TreeErr.BadToken(o)
             ;
-            match res
-            | Ok(o) => Ok(o)
-            | Err(e) => throw e
-            ;
+            res
         ;
     ;
 
@@ -87,7 +84,7 @@ class Parser
         if (self.is_end())
             throw TreeErr.Err
         ;
-        var res = // Todo: pick type
+        var res = Err(TreeErr.Unnassign)
         let t = self.advance()
         match t
         | TokenType.KwFn => res = self.fn_def(True)
@@ -115,7 +112,7 @@ class Parser
         var mod_item = Node.ModDef{name: name, item: #[]}
         while not self.is_end()
             let item = self.advance()
-            var res: <Node, TreeErr>
+            var res = Err(TreeErr.Unassign)
 
             match item
             | KwClass => res = self.parse_class()
@@ -158,9 +155,29 @@ class Parser
     ;
 
     fn enum_def(&var self, public = False)
+        if self.is_end()
+            throw TreeErr.Unfinished
+        ;
+        let name = self.advance()
+        match name.type
+        | Identifier =>
+        | e => throw TreeErr.BadToken(e)
+        ;
+        while not self.is_end()
+
+        ;
     ;
 
-    fn var_def(&var self, mutable = False)   
+    fn var_def(&var self, mutable = False)
+        if self.is_end()
+            throw TreeErr.Unifinished
+        ;
+        let first = self.advance()
+        match first.type
+        |
+        |
+        |
+        ;
     ;
 
     fn static_def(&var self) 
@@ -174,7 +191,7 @@ class Parser
         self.current >= self.len
     ;
 
-    fn get_next(var self: &var Self, expect: TokenType)
+    fn get_next(&var self, expect: TokenType)
         while (not self.is_end())
             let t = self.src[self.char]
             if (assert(expect, t.type))
