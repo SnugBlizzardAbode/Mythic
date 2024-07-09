@@ -36,7 +36,7 @@ class Parser
         var nodes:[Node] = #[]
         while (not self.is_end)
             let token = self.advance()
-            var res = // Todo: pick type
+            var res = Err(TreeErr.Unexpect)
 
             use token::TokenType
             match token.type
@@ -71,12 +71,13 @@ class Parser
 
             use token::TokenType
             match token
-            | Identifier => res = self.library_import()
-            | StringLit => res = self.file_import()
+            | Identifier => imports.append(self.library_import()?)
+            | StringLit => imports.append(self.file_import()?)
+            | Semicolon => break
             | o => throw TreeErr.BadToken(o)
             ;
-            res
         ;
+        imports
     ;
 
     // Node!TreeErr
