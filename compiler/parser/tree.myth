@@ -130,16 +130,24 @@ class Parser
     ;
 
     fn fn_def(&var self, public = False)
-        let name = self.get_next(TokenType.Identifier)?
-        self.is_next(TokenType.LParen)?
+        let name = match self.advance()
+            | TokenType.Identifier(o) => o
+            | e => throw TreeErr.Unexpect
+            ;
+        // var return_type = TypeDef.None
         let arg = self.parse_arg()?
-        self.is_next(TokenType.RParen)?
-        var return_type = TypeDef.None
-        self.is_next(TokenType.LCurly)?
-        let body = self.parse_statement()?
-        self.is_next(TokenType.RCurly)?
-        let fn_node = FnDef{name, public, arg, body}
-        Node.FnDef(fn_node)
+        let body = self.parse_body()?
+        Ok(Node.FnDef(FnDef{name, public, arg, body}))
+    ;
+
+    fn parse_arg(&var self)
+        if not self.advance() == TokenType.LParen
+            throw TreeErr.Unexpect
+        ;
+        while not self.is_end()
+
+        ;
+
     ;
 
     fn class_def(&var self, public = False) 
