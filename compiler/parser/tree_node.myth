@@ -1,3 +1,40 @@
+struct ArgDef
+{
+    mutable: bool,
+    name: String,
+}
+
+enum ClassType
+| EnumT(EnumDef)
+| StructT(StructDef)
+;
+
+enum Expr
+| ForExpr
+| IfExpr
+| MatchExpr
+| WhileExpr
+;
+
+struct FnDef
+{
+    name: String,
+    public: bool,
+    arg: [Variable] = #[],
+    item: [Statement],
+}
+
+struct ImportItem
+{
+    type: ImportType,
+    as_mod: ModPath,
+}
+
+enum ImportType
+| File(Path)
+| Library(ModPath)
+;
+
 enum Node
 | ImportDef ([ImportItem])
 | ModDef { name: String, item: [Node] }
@@ -9,21 +46,6 @@ enum Node
 | FnDef(FnDef)
 ;
 
-enum ClassType
-| EnumT(EnumDef)
-| StructT(StructDef)
-;
-
-struct ImportItem 
-{
-    type: ImportType,
-    as_mod: ModPath,
-}
-
-enum ImportType
-| File(Path)
-| Library(ModPath)
-;
 
 struct VarDef 
 { 
@@ -38,29 +60,8 @@ struct Variable
     type: Type,
 }
 
-struct ArgDef 
-{
-    mutable: bool,
-    name: String,
-}
-
-struct FnDef 
-{
-    name: String,
-    public: bool,
-    arg: [Variable] = #[],
-    item: [Statement],
-}
-
 enum Statement
 | Declar(VarDef)
 | Assign
 | Expr(Expr)
-;
-
-enum Expr
-| ForExpr
-| IfExpr
-| MatchExpr
-| WhileExpr
 ;
