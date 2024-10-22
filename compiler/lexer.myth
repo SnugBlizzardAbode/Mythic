@@ -1,0 +1,240 @@
+use package::token
+
+enum LexerErr
+| File(os::FileErr)
+| List(ListErr)
+| Char(String)
+;
+
+// [Token]!LexerErr 
+fn scan(file: Path)
+    let src = os::read_file(file).catch(fn(e)LexerErr.File(e)).char()
+    Tokenizer{src, file}.scan()?
+;
+
+class Tokenizer
+    struct 
+    { 
+        src: [String],
+        file: Path,
+        token: [Token] = #[],
+        line: u32 = 0,
+        char: i64 = 0,
+        length: i64 = 0,
+    }
+
+    fn scan: [Token]!LexerErr(mut self)
+        self.length = self.src.range()
+        while (not self.is_end())
+            self.next_lexeme(True)?
+        ;
+        Ok(self.token)
+    ;
+
+    // !LexerErr
+    fn next_lexeme(&mut self, line_aware: bool)
+        let char = self.advance()
+
+        match char
+        | '$' => self.add_token(TokenType.Currency)
+        | ' ' => continue
+        | '&' => self.add_token(TokenType.Ref)
+        | '@' => self.add_token(TokenType.At)
+        | '?' => self.add_token(TokenType.Question)
+        | ',' => self.add_token(TokenType.Comma)
+        | '.' => self.add_token(TokenType.Dot)
+        | '_' => self.add_token(TokenType.Underscore)
+        | '}' => self.add_token(TokenType.Semicolon)
+        | '{' => self.add_token(TokenType.LCurly)
+        | '}' => self.add_token(TokenType.RCurly)
+        | '[' => self.add_token(TokenType.LBrace)
+        | ']' => self.add_token(TokenType.RBrace)
+        | '\n' => 
+        | '\r\n' => 
+        | '\t' =>
+        | '/' => self.parse_lslash()
+        | ':' => self.parse_colon()
+        | '+' => self.parse_plus()
+        | '-' => self.parse_minus()
+        | '<' => self.parse_less()
+        | '>' => self.parse_great()
+        | '=' => self.parse_eq()
+        | '!' => self.add_token(TokenType.Exclam)
+        | '*' => self.parse_star()
+        | '"' => self.string_literal('"')
+        | "'" => self.string_literal("'")
+        | '(' => self.add_token(TokenType.LParen)
+        | ')' => self.add_token(TokenType.RParen)
+        | '#' => self.add_token(TokenType.Hash)
+        | o => 
+            if (is_digit(o))
+                self.number(o)
+            else
+                self.parse_word(o)
+            ;
+        ;   
+    ;
+
+    fn advance(&mut self)
+        let char = self.src[self.char]
+        self.char++
+        char
+    ;
+
+    fn add_token(&mut self, type: TokenType)
+        let token = Token{type, None, self.line}
+        self.token.append(token)
+    ;
+
+    fn add_lit_token(&mut self, type: TokenType, lit: String)
+        let token = Token{type, lit, self.line}:
+        self.token.append(token)
+    ;
+
+    fn expect(self, expec: String)
+        if (not self.is_end())
+            if (self.src[self.char] == expec)
+                True
+            else
+                False
+        else
+            False
+        ;
+    ;
+
+    fn peek(self, char: String)
+        self.src[self.char] == char
+    ;
+
+    fn string_literal(&mut self, quote: String)
+        let mut literal = ""
+        while (not self.is_end())
+            let char = self.advance()
+            if (char == quote)
+                self.add_lit_token()
+            else
+                if (char in list['\n', '\r\n'])
+                    self.line++
+                ;
+                literal += char
+            ;
+        ; // end while
+    ; // end fn
+
+    fn parse_lslash(&mut self)
+        if (not self.is_end())
+            match self.src[self.char]
+            | "*" => self.block_comment()
+            | "/" => self.line_comment()
+            | _ => self.add_token(TokenType.LSlash)
+            ; 
+        ;
+    ;
+
+    fn is_digit(char: String)
+        char >= '0' and char <= '9'
+    ;
+
+    fn parse_word(&mut self, mut literal: String)
+        while (not self.is_end())
+            let char = self.peek()
+            if (not is_alpha(char) and not char == '_')
+                break
+            ;
+            literal += char
+            self.char++
+        ;
+
+        match literal
+        | 'and' => self.add_token(TokenType.KwAnd)
+        | 'as' => self.add_token(TokenType.KwAs)
+        | 'break' => self.add_token(TokenType.KwBreak)
+        | 'class' => self.add_token(TokenType.KwClass)
+        | 'const' => self.add_token(TokenType.KwConst)
+        | 'continue' => self.add_token(TokenType.KwContinue)
+        | 'elif' => self.add_token(TokenType.KwElif)
+        | 'else' => self.add_token(TokenType.KwElse)
+        | 'enum' => self.add_token(TokenType.KwEnum)
+        | 'extend' => self.add_token(TokenType.KwExtend)
+        | 'False' => self.add_token(TokenType.KwFalse)
+        | 'fn' => self.add_token(TokenType.KwFn)
+        | 'for' => self.add_token(TokenType.KwFor)
+        | 'if' => self.add_token(TokenType.KwIf)
+        | 'import' => self.add_token(TokenType.KwImport)
+        | 'in' => self.add_token(TokenType.KwIn)
+        | 'let' => self.add_token(TokenType.KwLet)
+        | 'match' => self.add_token(TokenType.KwMatch)
+        | 'mod' => self.add_token(TokenType.KwMod)
+        | 'mut' => self.add_token(TokenType.KwMut)
+        | 'or' => self.add_token(TokenType.KwOr)
+        | 'package' => self.add_token(TokenType.KwPackage)
+        | 'pub' => self.add_token(TokenType.KwPub)
+        | 'return' => self.add_token(TokenType.KwReturn)
+        | 'self' => self.add_token(TokenType.KwSelfValue)
+        | 'Self' => self.add_token(TokenType.KwSelfType)
+        | 'static' => self.add_token(TokenType.KwStatic)
+        | 'struct' => self.add_token(TokenType.KwStruct)
+        | 'throw' => self.add_token(TokenType.KwThrow)
+        | 'True' => self.add_token(TokenType.KwTrue)
+        | 'use' => self.add_token(TokenType.KwUse)
+        | 'wait' => self.add_token(TokenType.KwWait)
+        | 'while' => self.add_token(TokenType.KwWhile)
+        | o => self.add_lit_token(TokenType.Identifier, o)
+        ;
+    ;
+
+    fn is_alpha(char: String)
+        'a' <= char <= 'z'
+            or
+        'A' <= char <= 'Z'
+    ;
+
+    fn number(&mut self, first: String)
+        if (self.is_end())
+            self.add_lit_token(TokenType.Int, first)
+            return
+        ;
+        let sec = self.src[self.char]
+        let mut literal = first + sec
+        if (first == '0')
+            match sec
+            | 'x' => return self.hexadecimal()
+            | 'b' => return self.binary()
+            | o => 
+            ;
+        elif (not is_digit(sec))
+            return self.add_lit_token(TokenType.Int, first)
+        ;
+        while (not self.is_end())
+            let char = self.src[self.char]
+            if (not is_digit(char) and not char == '.')
+                break
+            ;
+            match char
+            | '.' => return self.float(literal + char)
+            | o => literal += char
+            ;
+            self.char++
+        ;
+        self.add_lit_token(TokenType.Int, literal)
+    ;  
+
+    fn float(&mut self, mut literal: String)
+        while (not self.is_end())
+            let char = self.src[self.char]
+            if (not is_digit(char))
+                break
+            ;
+            literal += char
+            self.char++
+        ;
+        self.add_lit_token(TokenType.Float, literal)
+    ;
+
+    fn is_end(self)
+        self.char >= self.length
+    ;
+;
+    
+    
+

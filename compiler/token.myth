@@ -1,0 +1,34 @@
+struct Token 
+{
+    type: TokenType,
+    literal: string?,
+    line: u32,
+}
+
+enum TokenType
+| LParen | RParen | LBrace | RBrace | LCurly
+| RCurly | LSlash | RSlash | Comma | Underscore
+| Semicolon | Dot | Currency | Ref | At | Question
+
+| Eq | EqEq | EqRVec | Plus | PlusPlus
+| PlusEq | Minus | MinusMinus | MinusEq
+| Less | LessEq | Great | GreatEq
+| Star | StarStar | Exclam | NotEq | Colon | PathSep
+
+// Literals
+| Identifier | StringLit | IntLit | FloatLit
+| ByteLit | HexadecimalLit
+
+// Keywords
+| KwAnd | KwAs | KwWait | KwBreak
+| KwClass | KwConst | KwContinue | KwElif
+| KwElse | KwEnum | KwExtend | KwFalse
+| KwFn | KwFor | KwIf | KwIn
+| KwImport | KwLet | KwMatch | KwMod
+| KwMut | KwOr | KwPackage | KwPub
+| KwReturn | KwSelfValue | KwSelfType
+| KwStatic | KwStruct | KwThrow | KwTrue
+| KwUse | KwWhile
+;
+
+

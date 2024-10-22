@@ -1,0 +1,237 @@
+use package::{parser::tree_node, token}
+
+/*
+    &mut self is alias for mut self: &mut Self
+*/
+
+
+enum TreeErr
+| EmptyProgram
+| Lexer(package::lexer::LexerErr)
+| BadToken(package::token::TokenType)
+| Unexpect
+| Unassign // placeholder
+;
+
+// [Node]!TreeErr
+fn parse_main(token: [Token], file: Path)
+    token.get(0).catch(fn(_)TreeErr.EmptyProgram)
+    let root = Parser{token, file, len(token)}
+        .create_tree()
+        .catch(fn(_)TreeErr.Err)
+    package::parser::imports::parse_import(root)?
+;
+
+class Parser
+    struct 
+    {
+        src: [Token],
+        file: Path,
+        len: u64,
+        current: u64 = 0,
+    }
+
+    fn pretty_print(&self)
+
+    ;
+
+    // [Node]!TreeErr
+    fn create_tree(self)
+        let mut nodes:[Node] = #[]
+        while (not self.is_end)
+            let token = self.advance()
+            let mut res = Err(TreeErr.Unexpect)
+
+            use token::TokenType
+            match token.type
+            | KwImport => res = self.parse_import()
+            | KwPub => res = self.parse_pub()
+            | KwMod => res = self.mod_def()
+            | KwFn => res = self.fn_def()
+            | KwClass => res = self.class_def()
+            | KwExtend => res = self.extend_node()
+            | KwStruct => res = self.struct_def()
+            | KwEnum => res = self.enum_def()
+            | KwLet => res = self.var_def()
+            | KwStatic => res = self.static_def()
+            | KwConst =>  res = self.const_def()
+            | e => throw TreeErr.BadToken(e)
+            ;
+            match res 
+            | Ok(o) => nodes.append(o)
+            | Err(e) => throw e
+            ;
+        ;
+        Ok(nodes)
+    ;
+
+    // Node!TreeErr 
+    fn parse_import(mut self: &mut Self)
+        let mut imports = Node.ImportDef(#[])
+        while not self.is_end()
+            let token = self.advance()
+            let mut res = Err(TreeErr.Unassign)
+
+            use token::TokenType
+            match token
+            | Identifier => imports.append(self.library_import()?)
+            | StringLit => imports.append(self.file_import()?)
+            | Semicolon => break
+            | o => throw TreeErr.BadToken(o)
+            ;
+        ;
+        imports
+    ;
+
+    // Node!TreeErr
+    fn parse_pub(mut self: &mut Self)
+        if (self.is_end())
+            throw TreeErr.Err
+        ;
+        let mut res = Err(TreeErr.Unnassign)
+        let t = self.advance()
+        match t
+        | TokenType.KwFn => res = self.fn_def(True)
+        | TokenType.KwMod => res = self.mod_def(True)
+        | TokenType.KwStruct => res = self.struct_def(True)
+        | TokenType.KwEnum => res = self.enum_def(True)
+        | TokenType.KwClass => res = self.class_def(True)
+        | e => throw TreeErr.BadToken(e)
+        ;
+        res
+    ;
+
+    fn mod_def(mut self: &mut Self, public = False)
+        if self.is_end()
+            throw TreeErr.Unfinished
+        ;
+        let name = self.advance()
+
+        use token::TokenType
+        if not name == Identifier
+            throw TreeErr.BadToken(name)
+        ;
+
+        let mut mod_item = Node.ModDef{name: name, item: #[]}
+        while not self.is_end()
+            let item = self.advance()
+            let mut res = Err(TreeErr.Unassign)
+
+            match item
+            | KwClass => res = self.parse_class()
+            | KwMod => res = self.parse_mod()
+            | KwStruct => res = self.struct_def()
+            | KwEnum => res = self.enum_def()
+            | KwFn => res => self.fn_def()
+            | KwPub => res => self.parse_pub()
+            | Semicolon => return Ok(mod_item)
+            | o => throw TreeErr.BadToken(o)
+            ;
+            mod_item.item.append(res?)
+        ;
+        throw TreeErr.Unfinished
+    ;
+
+    fn fn_def(&mut self, public = False)
+        let name = match self.advance()
+            | TokenType.Identifier(o) => o
+            | e => throw TreeErr.Unexpect
+            ;
+        // let mut return_type = TypeDef.None
+        let arg = self.parse_arg()?
+        let body = self.parse_body()?
+        Ok(Node.FnDef(FnDef{name, public, arg, body}))
+    ;
+
+    fn parse_arg(&mut self)
+        if not self.advance() == TokenType.LParen
+            throw TreeErr.Unexpect
+        ;
+        while not self.is_end()
+
+        ;
+
+    ;
+
+    fn class_def(&mut self, public = False)
+    ;
+
+    fn extend_node()
+    ;
+
+    fn struct_def(&mut self, public = False)
+    ;
+
+    fn enum_def(&mut self, public = False)
+        if self.is_end()
+            throw TreeErr.Unfinished
+        ;
+        let name = self.advance()
+        match name.type
+        | Identifier =>
+        | e => throw TreeErr.BadToken(e)
+        ;
+        while not self.is_end()
+
+        ;
+    ;
+
+    fn var_def(&mut self)
+        if self.is_end()
+            throw TreeErr.Unifinished
+        ;
+        let first = self.advance()
+        match first.type
+        |
+        |
+        |
+        ;
+    ;
+
+    fn static_def(&mut self)
+    ;
+
+    fn const_def(&mut self)
+    ;
+
+
+    fn is_end(self: &ro Self)
+        self.current >= self.len
+    ;
+
+    fn get_next(&mut self, expect: TokenType)
+        while (not self.is_end())
+            let t = self.src[self.char]
+            if (assert(expect, t.type))
+                self.current++
+                return t
+            ;
+            match t.type
+            | TokenType.Semicolon =>
+            | e => throw TreeErr.Unexpect(expect, e)
+            ;
+            self.current++
+        ; // end while
+    ;
+
+    fn is_next(mut self: &mut Self, expect: TokenType)
+        while (not self.is_end())
+            let t = self.src[self.char]
+            if (assert(expect, t.type))
+                self.current++
+                return Ok()
+            ;
+            match t.type
+            | TokenType.Semicolon =>
+            | e => throw TreeErr.Unexpect(expect, e)
+            ;
+            self.current++
+        ;
+    ;
+
+    fn advance(mut self: &mut Self)
+        let token = self.src[self.current]
+        self.current++
+        token
+    ;
+; 

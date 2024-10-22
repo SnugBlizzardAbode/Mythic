@@ -1,0 +1,108 @@
+import 
+    os
+    cli
+    sys
+    "lexer"
+    "token"
+    "parser"
+;
+
+/* 
+ By default accessing an index of an uknown sized list will return result
+ This changes it to access it with no safeguards.
+ Program panics if index doesn't exist
+*/
+$unchecked_list_access
+
+enum BmcErr
+| List(ListErr)
+| Input(cli::ParseErr)
+| File(os::FileErr)
+| Lexer(lexer::LexerErr)
+| Tree(parser::tree::TreeErr)
+| Ast(parser::ast::AstErr)
+| Other
+| Arg
+;
+
+class Input(derive(cli::Parser))
+    struct {
+        @[cli(short = 'o')]
+        output: Option<string>
+
+        @[cli(short = 't')]
+        target: Option<string>
+
+        file: string
+    }
+;
+
+fn main: !BmcErr()
+    let setting = sys::argv
+    let param = Input.parse(setting)
+        .catch(fn(e)BmcErr.Input(e))
+
+    let file = os::Path.from(param.file)
+    let token = lexer::scan(file)
+        .catch(fn(e)BmcErr.Lexer(e))
+
+    if param.target == Some("token_stream")
+        for tokie in token
+            print(tokie)
+        ;
+        return Ok()
+    ;
+
+    // Parse tree converts a list of tokens/words in Mythic
+    // into a tree of theoretically correct sentences.
+    let tree = parser::tree::parse_main(token)
+        .catch(fn(e)BmcErr.Tree(e))
+    if param.target == Some("parse_tree")
+        tree.pretty_print()
+        return Ok()
+    ;
+
+
+    // The ast verifies the validity of sentences
+    let ast = parser::ast::parse(tree)
+        .catch(fn(e)BmcErr.Ast(e))
+    if param.target == Some("ast")
+        ast.pretty_print()
+        return Ok()
+    ;
+
+    let ir = ir::translate(ast)
+    if param.target == Some("ir")
+        ir.pretty_print()
+        return Ok()
+    ;
+
+;
+
+enum Isa 
+| Riscv
+| X86
+| Armv8
+;
+
+enum Platform
+| Mac
+| Linux
+| Windows
+| Bard
+;
+
+enum Optimize 
+| Memory
+| Speed
+| Normal
+;
+
+struct Config 
+{
+    isa: Isa,
+    os: Platform,
+    optimize: Optimize,
+    output_loc: ?Path,
+}
+

@@ -1,0 +1,11 @@
+use package::parser::{tree_node, tree::TreeErr}
+
+/* Todo
+  Only the main file can import other source code files.
+  This will tokenize any imports and parse them.
+ */
+ 
+// TreeErr![Node]
+fn parse_import(root: [Node])
+    
+;
