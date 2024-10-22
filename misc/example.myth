@@ -1,0 +1,54 @@
+import 
+    path::to::library::{a,b}
+    "path/to/file_1"
+    "/Users/foo/file_2"
+;
+
+mod other 
+    /*
+        Block comment
+    */
+;
+
+fn main()
+    // Variables
+    let non_reassignable = 1
+    var mutable = 7.8
+
+    // Negative number
+    const COMP_VALUE: int = ~3
+    static non_changable = 42
+    
+    foo() // function call
+    Bar.g() // method
+
+    #(1,"ok") // Tuple creation
+    #[1,2,3] // List creation
+
+    struct Point{x: int, y: int}
+    let tree = Point{x: 22, y: 39}
+
+    enum Drink
+    | Water
+    | Soda
+    ;
+    let fav = Drink.Water
+
+    match fav
+    | Water => print('refreshing')
+    | _ => 
+    ;
+
+    let welcome = #['h', 'e', 'l', 'l', 'o']
+    for (x in 1..6)
+        match welcome[x - 1]
+        | Ok(o) => print(o)
+        | Err(e) => 
+        ;
+    ;
+
+    if (condition) 
+    elif (condition) 
+    ;
+    print("Thanks for all the fish.")
+;
