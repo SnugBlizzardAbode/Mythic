@@ -13,11 +13,10 @@ mod other
 fn main()
     // Variables
     let non_reassignable = 1
-    var mutable = 7.8
+    let mut mutable = 7.8
 
     // Negative number
     const COMP_VALUE: int = ~3
-    static non_changable = 42
     
     foo() // function call
     Bar.g() // method
