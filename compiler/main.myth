@@ -17,11 +17,44 @@ $unchecked_list_access
 enum BmcErr
 | List(ListErr)
 | Input(cli::ParseErr)
-| Config()
 | File(os::FileErr)
-| Lexer(lexer::LexerErr)
 | Tree(parser::tree::TreeErr)
 | Ast(parser::ast::AstErr)
+;
+
+@[if(target_build = 'armv8_mac')]
+const DEFAULT_TARGET = Target.Armv8(Platform.Mac)
+@[if(target_build = 'riscv_bard')]
+const DEFAULT_TARGET = Target.Riscv(Platform.Bard)
+@[if(target_build = 'riscv_linux')]
+const DEFAULT_TARGET = Target.Riscv(Platform.Linux)
+@[if(target_build = 'x86_windows')]
+const DEFAULT_TARGET = Target.X86(Platform.Windows)
+@[if(target_build = 'x86_linux')]
+const DEFAULT_TARGET = Target.X86(Platform.Linux)
+
+enum Target
+| Token
+| ParseTree
+| Ast
+| Ir
+| Risv(Platform)
+| X86(Platform)
+| Armv8(Platform)
+;
+
+enum Platform
+| Bard
+| Linux
+| Mac
+| Metal
+| Windows
+;
+
+enum Optimize
+| Memory
+| Speed
+| Normal
 ;
 
 class Input(derive(cli::Parser))
@@ -30,22 +63,49 @@ class Input(derive(cli::Parser))
         output: ?os::Path
 
         @[cli(short = 't', validator = parse_target)]
-        target: ?Target
+        target: Target = DEFAULT_TARGET
+
+        @[cli(short = 'p', validator = parse_performance)]
+        performance: Optimize = Optimize.Normal
 
         @[cli(validator = load_source)]
         source: [string]
     }
 
-    fn parse_target: Target!BmcErr(target: string)
+    fn parse_performance: Optimize!(optimize: string)
+        match optimize
+        | 'memory' => Ok(Optimize.Memory)
+        | 'speed' => Ok(Optimize.Speed)
+        | 'Normal' => Ok(Optimize.Normal)
+        | _ => throw
+        ;
     ;
 
-    fn parse_path: os::Path!BmcErr(target: string)
-
+    fn parse_target: Target!(target: string)
+        Ok(
+            match target
+            | 'armv8_linux' => Target.Armv8(Platform.Linux)
+            | 'armv8_metal' => Target.Armv8(Platform.Metal)
+            | 'riscv_bard' => Target.Riscv(Platform.Bard)
+            | 'riscv_linux' => Target.Riscv(Platform.Linux)
+            | 'riscv_metal' => Target.Riscv(Platform.Metal)
+            | 'x86_linux' => Target.X86(Platform.Linux)
+            | 'x86_windows' => Target.X86(Platform.Windows)
+            | 'x86_metal' => Target.X86(Platform.Metal)
+            | _ => throw
+            ;
+        )
     ;
 
-    fn load_source: [string]!BmcErr(input: string)
+    fn parse_path: os::Path!(target: string)
+        Ok(os::Path.from(target)
+            .try()
+        )
+    ;
+
+    fn load_source: [string]!(input: string)
         Ok(os::read_file(input)
-            .catch(fn(e)BmcErr.File(e))
+            .try()
             .char()
         )
     ;
@@ -57,7 +117,6 @@ fn main: !BmcErr()
         .catch(fn(e)BmcErr.Input(e))
 
     let token = lexer::scan(param.source)
-        .catch(fn(e)BmcErr.Lexer(e))
 
     if (let Some(Target.Token) == config.target)
         token.pretty_print()
@@ -66,7 +125,7 @@ fn main: !BmcErr()
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
-    let tree = parser::tree::parse_main(token)
+    let tree = parser::tree::parse_main(token.token)
         .catch(fn(e)BmcErr.Tree(e))
 
     if (let Some(Target.ParseTree) == config.target)
@@ -88,29 +147,4 @@ fn main: !BmcErr()
         ir.pretty_print()
         return Ok()
     ;
-
-;
-
-enum Target
-| Token
-| ParseTree
-| Ast
-| Ir
-| Risv(Platform)
-| X86(Platform)
-| Armv8(Platform)
-;
-
-enum Platform
-| Bard
-| Linux
-| Mac
-| Metal
-| Windows
-;
-
-enum Optimize 
-| Memory
-| Speed
-| Normal
 ;
