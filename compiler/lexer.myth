@@ -1,14 +1,7 @@
 use package::token
 
-enum LexerErr
-| File(os::FileErr)
-| List(ListErr)
-| Char(String)
-;
-
-// [Token]!LexerErr 
 fn scan(src: [string])
-    Tokenizer{src, file}.scan()?
+    Tokenizer{src, file}.scan()
 ;
 
 class Tokenizer
@@ -22,15 +15,14 @@ class Tokenizer
         length: i64 = 0,
     }
 
-    fn scan: [Token]!LexerErr(mut self)
+    fn scan: [Token](mut self)
         self.length = self.src.range()
         while (not self.is_end())
-            self.next_lexeme(True)?
+            self.next_lexeme(True)
         ;
-        Ok(self.token)
+        self
     ;
 
-    // !LexerErr
     fn next_lexeme(&mut self, line_aware: bool)
         let char = self.advance()
 
