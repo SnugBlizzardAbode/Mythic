@@ -7,8 +7,7 @@ enum LexerErr
 ;
 
 // [Token]!LexerErr 
-fn scan(file: Path)
-    let src = os::read_file(file).catch(fn(e)LexerErr.File(e)).char()
+fn scan(src: [string])
     Tokenizer{src, file}.scan()?
 ;
 

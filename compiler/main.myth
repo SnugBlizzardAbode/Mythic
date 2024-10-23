@@ -8,7 +8,7 @@ import
 ;
 
 /* 
- By default accessing an index of an uknown sized list will return result
+ By default accessing an index of an uknown/dyn sized list will return result
  This changes it to access it with no safeguards.
  Program panics if index doesn't exist
 */
@@ -17,6 +17,7 @@ $unchecked_list_access
 enum BmcErr
 | List(ListErr)
 | Input(cli::ParseErr)
+| Config()
 | File(os::FileErr)
 | Lexer(lexer::LexerErr)
 | Tree(parser::tree::TreeErr)
@@ -27,14 +28,28 @@ enum BmcErr
 
 class Input(derive(cli::Parser))
     struct {
-        @[cli(short = 'o')]
-        output: Option<string>
+        @[cli(short = 'o', validator = parse_path)]
+        output: ?os::Path
 
-        @[cli(short = 't')]
-        target: Option<string>
+        @[cli(short = 't', validator = parse_target)]
+        target: ?Target
 
-        file: string
+        @[cli(validator = load_source)]
+        source: [string]
     }
+
+    fn parse_target: Target!BmcErr(target: string)
+    ;
+
+    fn parse_path: os::Path!BmcErr(target: string)
+
+    ;
+
+    fn load_source: string!BmcErr(input: string)
+        os::read_file(input)
+            .catch(fn(e)BmcErr.File(e))
+            .char()
+    ;
 ;
 
 fn main: !BmcErr()
@@ -42,14 +57,11 @@ fn main: !BmcErr()
     let param = Input.parse(setting)
         .catch(fn(e)BmcErr.Input(e))
 
-    let file = os::Path.from(param.file)
-    let token = lexer::scan(file)
+    let token = lexer::scan(param.source)
         .catch(fn(e)BmcErr.Lexer(e))
 
-    if param.target == Some("token_stream")
-        for tokie in token
-            print(tokie)
-        ;
+    if (let Some(Target.Token) == config.target)
+        token.pretty_print()
         return Ok()
     ;
 
@@ -57,7 +69,8 @@ fn main: !BmcErr()
     // into a tree of theoretically correct sentences.
     let tree = parser::tree::parse_main(token)
         .catch(fn(e)BmcErr.Tree(e))
-    if param.target == Some("parse_tree")
+
+    if (let Some(Target.ParseTree) == config.target)
         tree.pretty_print()
         return Ok()
     ;
@@ -79,17 +92,22 @@ fn main: !BmcErr()
 
 ;
 
-enum Isa 
-| Riscv
-| X86
-| Armv8
+enum Target
+| Token
+| ParseTree
+| Ast
+| Ir
+| Risv(Platform)
+| X86(Platform)
+| Armv8(Platform)
 ;
 
 enum Platform
-| Mac
-| Linux
-| Windows
 | Bard
+| Linux
+| Mac
+| Metal
+| Windows
 ;
 
 enum Optimize 
@@ -97,12 +115,3 @@ enum Optimize
 | Speed
 | Normal
 ;
-
-struct Config 
-{
-    isa: Isa,
-    os: Platform,
-    optimize: Optimize,
-    output_loc: ?Path,
-}
-
