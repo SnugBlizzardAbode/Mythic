@@ -22,8 +22,6 @@ enum BmcErr
 | Lexer(lexer::LexerErr)
 | Tree(parser::tree::TreeErr)
 | Ast(parser::ast::AstErr)
-| Other
-| Arg
 ;
 
 class Input(derive(cli::Parser))
@@ -45,10 +43,11 @@ class Input(derive(cli::Parser))
 
     ;
 
-    fn load_source: string!BmcErr(input: string)
-        os::read_file(input)
+    fn load_source: [string]!BmcErr(input: string)
+        Ok(os::read_file(input)
             .catch(fn(e)BmcErr.File(e))
             .char()
+        )
     ;
 ;
 
