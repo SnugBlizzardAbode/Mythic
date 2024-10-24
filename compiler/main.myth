@@ -18,6 +18,7 @@ enum BmcErr
 | List(ListErr)
 | Input(cli::ParseErr)
 | File(os::FileErr)
+| Lexer(lexer::LexerErr)
 | Tree(parser::tree::TreeErr)
 | Ast(parser::ast::AstErr)
 ;
@@ -60,7 +61,7 @@ enum Optimize
 class Input(derive(cli::Parser))
     struct {
         @[cli(short = 'o', validator = parse_path)]
-        output: ?os::Path
+        output: os::Path = os::current_path()
 
         @[cli(short = 't', validator = parse_target)]
         target: Target = DEFAULT_TARGET
@@ -113,14 +114,12 @@ class Input(derive(cli::Parser))
 
 fn main: !BmcErr()
     let setting = sys::argv
-    let param = Input.parse(setting)
+    let config = Input.parse(setting)
         .catch(fn(e)BmcErr.Input(e))
 
-    let token = lexer::scan(param.source)
-
-    if (let Some(Target.Token) == config.target)
-        token.pretty_print()
-        return Ok()
+    let token = lexer::scan(config.source)
+    if (let Target.Token == config.target)
+        return write_file(config.output, token.to_byte())
     ;
 
     // Parse tree converts a list of tokens/words in Mythic
@@ -128,23 +127,20 @@ fn main: !BmcErr()
     let tree = parser::tree::parse_main(token.token)
         .catch(fn(e)BmcErr.Tree(e))
 
-    if (let Some(Target.ParseTree) == config.target)
-        tree.pretty_print()
-        return Ok()
+    if (let Target.ParseTree == config.target)
+        return write_file(config.output, tree.to_byte())
     ;
 
 
     // The ast verifies the validity of sentences
     let ast = parser::ast::parse(tree)
         .catch(fn(e)BmcErr.Ast(e))
-    if param.target == Some("ast")
-        ast.pretty_print()
-        return Ok()
+    if (let Target.Ast == config.target)
+        return write_file(config.output, tree.to_byte())
     ;
 
     let ir = ir::translate(ast)
-    if param.target == Some("ir")
-        ir.pretty_print()
-        return Ok()
+    if (let Target.Ir == config.target)
+        return write_file(config.output, tree.to_byte())
     ;
 ;
