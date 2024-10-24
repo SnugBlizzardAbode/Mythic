@@ -113,34 +113,37 @@ class Input(derive(cli::Parser))
 ;
 
 fn main: !BmcErr()
+    // Takes the user input and verifies parameters for the compiler are correctly inputted.
     let setting = sys::argv
     let config = Input.parse(setting)
-        .catch(fn(e)BmcErr.Input(e))
+        .handle(\e\BmcErr.Input(e)))
 
-    let token = lexer::scan(config.source)
+    // Takes the source code of the program and turns it into a list of tokens.
+    let token = lexer::scan(config.source).catch()
     if (let Target.Token == config.target)
-        return write_file(config.output, token.to_byte())
+        return Ok(os::write_byte(config.output, token.to_byte())
+            .handle(\e\BmcErr.File(e))))
     ;
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
-    let tree = parser::tree::parse_main(token.token)
-        .catch(fn(e)BmcErr.Tree(e))
-
+    let tree = parser::tree::parse_main(token.token).catch()
     if (let Target.ParseTree == config.target)
-        return write_file(config.output, tree.to_byte())
+        return Ok(os::write_byte(config.output, tree.to_byte())
+            .handle(\e\BmcErr.File(e)))
     ;
 
-
-    // The ast verifies the validity of sentences
-    let ast = parser::ast::parse(tree)
-        .catch(fn(e)BmcErr.Ast(e))
+    // The ast verifies the validity of sentences by with type checking and lifetime analysis.
+    let ast = parser::ast::parse(tree).catch()
     if (let Target.Ast == config.target)
-        return write_file(config.output, tree.to_byte())
+        return Ok(os::write_byte(config.output, tree.to_byte())
+                .handle(\e\BmcErr.File(e)))
     ;
 
+    // The ir is a simplified abstract assembly/machine language where optimizations occur before being compiled to its final form.
     let ir = ir::translate(ast)
     if (let Target.Ir == config.target)
-        return write_file(config.output, tree.to_byte())
+        return Ok(os::write_byte(config.output, tree.to_byte())
+            .handle(\e\BmcErr.File(e))))
     ;
 ;
