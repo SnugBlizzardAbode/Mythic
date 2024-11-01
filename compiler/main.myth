@@ -1,27 +1,27 @@
-import 
-    os
-    cli
-    sys
-    "lexer"
-    "token"
+import:
+    os,
+    cli,
+    sys,
+    "lexer",
+    "token",
     "parser"
-;
+    ;
 
 /* 
  By default accessing an index of an uknown/dyn sized list will return result
  This changes it to access it with no safeguards.
  Program panics if index doesn't exist
 */
-$unchecked_list_access
+$list_access = "unchecked"
 
-enum BmcErr
-| List(ListErr)
-| Input(cli::ParseErr)
-| File(os::FileErr)
-| Lexer(lexer::LexerErr)
-| Tree(parser::tree::TreeErr)
-| Ast(parser::ast::AstErr)
-;
+enum BmcErr:
+    | List(ListErr)
+    | Input(cli::ParseErr)
+    | File(os::FileErr)
+    | Lexer(lexer::LexerErr)
+    | Tree(parser::tree::TreeErr)
+    | Ast(parser::ast::AstErr)
+    ;
 
 @[if(target_build = 'armv8_mac')]
 const DEFAULT_TARGET = Target.Armv8(Platform.Mac)
@@ -34,31 +34,27 @@ const DEFAULT_TARGET = Target.X86(Platform.Windows)
 @[if(target_build = 'x86_linux')]
 const DEFAULT_TARGET = Target.X86(Platform.Linux)
 
-enum Target
-| Token
-| ParseTree
-| Ast
-| Ir
-| Risv(Platform)
-| X86(Platform)
-| Armv8(Platform)
-;
+enum Target:
+    | Token | ParseTree
+    | Ast | Ir
+    | Risv(Platform)
+    | X86(Platform)
+    | Armv8(Platform)
+    ;
 
-enum Platform
-| Bard
-| Linux
-| Mac
-| Metal
-| Windows
-;
+enum Platform:
+    | Bard | Linux
+    | Mac | Metal
+    | Windows
+    ;
 
-enum Optimize
-| Memory
-| Speed
-| Normal
-;
+enum Optimize:
+    | Memory
+    | Speed
+    | Normal
+    ;
 
-class Input(derive(cli::Parser))
+class Input(derive(cli::Parser)):
     struct {
         @[cli(short = 'o', validator = parse_path)]
         output: os::Path = os::current_path()
@@ -73,7 +69,7 @@ class Input(derive(cli::Parser))
         source: [string]
     }
 
-    fn parse_performance: Optimize!(optimize: string)
+    fn parse_performance(optimize: string) -> Optimize!:
         match optimize
         | 'memory' => Ok(Optimize.Memory)
         | 'speed' => Ok(Optimize.Speed)
@@ -82,68 +78,66 @@ class Input(derive(cli::Parser))
         ;
     ;
 
-    fn parse_target: Target!(target: string)
+    fn parse_target(target: string) -> Target!:
         Ok(
-            match target
-            | 'armv8_linux' => Target.Armv8(Platform.Linux)
-            | 'armv8_metal' => Target.Armv8(Platform.Metal)
-            | 'riscv_bard' => Target.Riscv(Platform.Bard)
-            | 'riscv_linux' => Target.Riscv(Platform.Linux)
-            | 'riscv_metal' => Target.Riscv(Platform.Metal)
-            | 'x86_linux' => Target.X86(Platform.Linux)
-            | 'x86_windows' => Target.X86(Platform.Windows)
-            | 'x86_metal' => Target.X86(Platform.Metal)
-            | _ => throw
-            ;
+            match target:
+                | 'armv8_linux' => Target.Armv8(Platform.Linux)
+                | 'armv8_metal' => Target.Armv8(Platform.Metal)
+                | 'riscv_bard' => Target.Riscv(Platform.Bard)
+                | 'riscv_linux' => Target.Riscv(Platform.Linux)
+                | 'riscv_metal' => Target.Riscv(Platform.Metal)
+                | 'x86_linux' => Target.X86(Platform.Linux)
+                | 'x86_windows' => Target.X86(Platform.Windows)
+                | 'x86_metal' => Target.X86(Platform.Metal)
+                | _ => throw
+                ;
         )
     ;
 
-    fn parse_path: os::Path!(target: string)
+    fn parse_path(target: string) -> os::Path!:
         Ok(os::Path.from(target)
             .try()
         )
-    ;
+        ;
 
-    fn load_source: [string]!(input: string)
+    fn load_source(input: string) -> [string]!:
         Ok(os::read_file(input)
             .try()
             .char()
         )
+        ;
     ;
-;
 
-fn main: !BmcErr()
-    // Takes the user input and verifies parameters for the compiler are correctly inputted.
+fn main() -> !BmcErr:
     let setting = sys::argv
     let config = Input.parse(setting)
-        .handle(\e\BmcErr.Input(e)))
+        .handle(\e -> BmcErr.Input(e)))
 
-    // Takes the source code of the program and turns it into a list of tokens.
+
     let token = lexer::scan(config.source).catch()
     if (let Target.Token == config.target)
         return Ok(os::write_byte(config.output, token.to_byte())
-            .handle(\e\BmcErr.File(e))))
-    ;
+            .handle(\e -> BmcErr.File(e))))
+        ;
 
     // Parse tree converts a list of tokens/words in Mythic
     // into a tree of theoretically correct sentences.
     let tree = parser::tree::parse_main(token.token).catch()
     if (let Target.ParseTree == config.target)
         return Ok(os::write_byte(config.output, tree.to_byte())
-            .handle(\e\BmcErr.File(e)))
-    ;
+            .handle(\e -> BmcErr.File(e)))
+        ;
 
     // The ast verifies the validity of sentences by with type checking and lifetime analysis.
     let ast = parser::ast::parse(tree).catch()
     if (let Target.Ast == config.target)
         return Ok(os::write_byte(config.output, tree.to_byte())
-                .handle(\e\BmcErr.File(e)))
-    ;
+                .handle(\e -> BmcErr.File(e)))
+        ;
 
-    // The ir is a simplified abstract assembly/machine language where optimizations occur before being compiled to its final form.
     let ir = ir::translate(ast)
     if (let Target.Ir == config.target)
         return Ok(os::write_byte(config.output, tree.to_byte())
-            .handle(\e\BmcErr.File(e))))
+            .handle(\e -> BmcErr.File(e))))
+        ;
     ;
-;
